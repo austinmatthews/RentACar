@@ -1,7 +1,7 @@
 /****************************************************************************************
  * @file  Table.java
  *
- * @author   John Miller
+ * @author   Team
  */
 
 import java.io.*;
