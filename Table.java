@@ -233,20 +233,59 @@ public class Table
      * @param table2      the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
+    @SuppressWarnings("unchecked")
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                                               + table2.name + ")");
-
-        String [] t_attrs = attributes1.split (" ");
-        String [] u_attrs = attributes2.split (" ");
+         + table2.name + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        try{
+            String [] t_attrs = attributes1.split (" ");
+            String [] u_attrs = attributes2.split (" ");
 
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+            Comparable[] temp = null;
+            int col1 = col(attributes1);
+            int col2 = table2.col(attributes2);
+
+            for(int i = 0; i < table2.tuples.size(); i++){
+                for(int j = 0; j < tuples.size(); j++){
+
+                    int result = table2.tuples.get(i)[col2].compareTo(tuples.get(j)[col1]);
+                    if(result == 0){
+
+                        temp = ArrayUtil.concat(tuples.get(j), table2.tuples.get(i));
+                        rows.add(temp);
+
+                    }
+
+                }
+            }
+
+            for(int x = 0; x < table2.attribute.length; x++){
+                for(int y = 0; y < attribute.length; y++){
+
+                    if(table2.attribute[x].equals(attribute[y]))
+                        table2.attribute[x] += 2;
+
+                }
+            }
+
+
+
+            return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
+              ArrayUtil.concat (domain, table2.domain), key, rows);
+
+        } catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("\nCheck Query");
+            System.out.println("One Or More Specified Attributes Are Incorrect\n");
+            System.out.println("Table 1 Attribute: " + attributes1);
+            System.out.println("Table 2 Attribute: " + attributes2);
+            return new Table(name + count++, ArrayUtil.concat(attribute, table2.attribute),
+                ArrayUtil.concat(domain, table2.domain), key, rows);
+        }
+
     } // join
 
     /************************************************************************************
@@ -259,17 +298,85 @@ public class Table
      * @param table2  the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
+    @SuppressWarnings("unchecked")
     public Table join (Table table2)
     {
         out.println ("RA> " + name + ".join (" + table2.name + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        ArrayList<String> matching = new ArrayList<String>();
+        ArrayList<String> mismatch = new ArrayList<String>();
 
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+        boolean match = false;
+
+        for(int i = 0; i < table2.attribute.length; i++){
+            match = false;
+            for(int j = 0; j < attribute.length; j++){
+
+                if (table2.attribute[i].equals(attribute[j])){
+                    matching.add(table2.attribute[i]);
+                    match = true;
+
+                }
+
+            }
+
+            if(match == false){
+
+                mismatch.add(table2.attribute[i]);
+
+            }
+
+        }
+
+        ArrayList<Integer> added1 = new ArrayList<Integer>();
+        ArrayList<Integer> added2 = new ArrayList<Integer>();
+        Comparable[] temp = new Comparable[mismatch.size()];
+
+        System.out.println(mismatch.size());
+
+        int counter = -1;
+
+        for(int i = 0; i < matching.size(); i++){
+            counter++;
+            for(int j = 0; j < tuples.size(); j++){
+                for(int k = 0; k < table2.tuples.size(); k++){
+
+                    int result = tuples.get(j)[col(matching.get(i))].compareTo(table2.tuples.get(k)[table2.col(matching.get(i))]);
+                    if(result == 0){
+
+                        if(!(added1.contains(j)) && !(added2.contains(k))){
+
+                            added1.add(j);
+                            added2.add(k);
+
+                            for(int z = 0; z < mismatch.size(); z++){
+
+                                temp[z] = table2.tuples.get(k)[table2.col(mismatch.get(z))];
+
+                            }
+
+                            rows.add(ArrayUtil.concat(tuples.get(j), temp));
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        int[] colPos = new int[mismatch.size()];
+        for(int index = 0; index < mismatch.size(); index++){
+            colPos[index] = table2.col(mismatch.get(index));
+        }
+
+        String[] mm = new String[mismatch.size()];
+        mismatch.toArray(mm);
+
+        return new Table (name + count++, ArrayUtil.concat (attribute, mm),
+                                          ArrayUtil.concat (domain, table2.extractDom(colPos, table2.domain)), key, rows);
     } // join
 
     /************************************************************************************
