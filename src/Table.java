@@ -176,6 +176,27 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
+ 
+        try
+        {
+        	if (this.index.get(keyVal) != null)
+        	{
+        		rows.add(this.index.get(keyVal));
+        	}
+        }
+        catch (Exception e)
+        {
+        	System.out.println("Error Table.java:Select(KeyType keyVal)." );
+        	System.out.println("See stack trace.\n");
+        	e.printStackTrace();
+        }
+//        Comparable [] tup;
+//    	for (int t = 0; t < this.tuples.size(); t++)
+//        {
+//        	tup = this.index.get(keyVal);
+//        	
+//        	rows.add(tup);
+//        }
 
         //  T O   B E   I M P L E M E N T E D 
 
