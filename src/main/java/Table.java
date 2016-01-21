@@ -12,6 +12,7 @@ import java.util.stream.*;
 import static java.lang.Boolean.*;
 import static java.lang.System.out;
 
+
 /****************************************************************************************
  * This class implements relational database tables (including attribute names, domains
  * and a list of tuples.  Five basic relational algebra operators are provided: project,
@@ -590,24 +591,25 @@ public class Table
     { 
     	boolean isChecked = false;
     	int counter = 0;
+    	
+    	//Check to see if the length of the given tuple matches the length of the tuples in this table.
     	if (t.length == this.attribute.length)
     	{
     		for (int i = 0; i < t.length; i++)
     		{
+    			//Check to see if the classes of the columns in the tuples match.
     			if (t[i].getClass().equals(this.domain.getClass()))
-    //			if (t[i].getClass() ==  this.domain[i].getName())
     			{
-    				counter++;
+    				isChecked = true;
+    			}
+    			else
+    			{
+    				isChecked = false;
+    				i = t.length + 1;
     			}
     		}
     	}   	
-
-    	if (this.attribute.length == counter)
-    	{
-    		isChecked = true;
-    	}
-    	//  T O   B E   I M P L E M E N T E D 
-
+    	
         return isChecked;
     } // typeCheck
 
