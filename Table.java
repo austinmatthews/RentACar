@@ -600,7 +600,7 @@ public class Table
     			}
     		}
     	}   	
-    	
+
     	if (this.attribute.size() == counter)
     	{
     		isChecked = true;
