@@ -590,18 +590,19 @@ public class Table
     { 
     	boolean isChecked = false;
     	int counter = 0;
-    	if (t.size() == attribute.size())
+    	if (t.length == this.attribute.length)
     	{
-    		for (int i = 0; i < t.size(); i++)
+    		for (int i = 0; i < t.length; i++)
     		{
-    			if (t[i].getClass() == domain[i].getClass())
+    			if (t[i].getClass().equals(this.domain.getClass()))
+    //			if (t[i].getClass() ==  this.domain[i].getName())
     			{
     				counter++;
     			}
     		}
     	}   	
 
-    	if (this.attribute.size() == counter)
+    	if (this.attribute.length == counter)
     	{
     		isChecked = true;
     	}
