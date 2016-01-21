@@ -336,34 +336,42 @@ public class Table
 
         System.out.println(mismatch.size());
 
-        int counter = -1;
+        for(int j = 0; j < tuples.size(); j++){
+            for(int k = 0; k < table2.tuples.size(); k++){
 
-        for(int i = 0; i < matching.size(); i++){
-            counter++;
-            for(int j = 0; j < tuples.size(); j++){
-                for(int k = 0; k < table2.tuples.size(); k++){
+                    ///////
+                boolean tupleMatch = false;
+                    // Change to Loop through all of ArrayList -> Matching
+                for(int m = 0; m < matching.size(); m++){
+                    int result = tuples.get(j)[col(matching.get(m))].compareTo(table2.tuples.get(k)[table2.col(matching.get(m))]);
 
-                    int result = tuples.get(j)[col(matching.get(i))].compareTo(table2.tuples.get(k)[table2.col(matching.get(i))]);
                     if(result == 0){
+                        tupleMatch = true;
+                    } else {
+                        tupleMatch = false;
+                    }                   
+                }
+                    ////////
 
-                        if(!(added1.contains(j)) && !(added2.contains(k))){
+                if(tupleMatch == true){
 
-                            added1.add(j);
-                            added2.add(k);
+                    if(!(added1.contains(j)) && !(added2.contains(k))){
 
-                            for(int z = 0; z < mismatch.size(); z++){
+                        added1.add(j);
+                        added2.add(k);
 
-                                temp[z] = table2.tuples.get(k)[table2.col(mismatch.get(z))];
+                        for(int z = 0; z < mismatch.size(); z++){
 
-                            }
-
-                            rows.add(ArrayUtil.concat(tuples.get(j), temp));
+                            temp[z] = table2.tuples.get(k)[table2.col(mismatch.get(z))];
 
                         }
+
+                        rows.add(ArrayUtil.concat(tuples.get(j), temp));
 
                     }
 
                 }
+
             }
         }
 
