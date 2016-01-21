@@ -594,7 +594,8 @@ public class Table
     	{
     		for (int i = 0; i < t.length; i++)
     		{
-    			if (t[i].getClass() == this.domain[i].getClass())
+    			if (t[i].getClass().equals(this.domain.getClass()))
+    //			if (t[i].getClass() ==  this.domain[i].getName())
     			{
     				counter++;
     			}
