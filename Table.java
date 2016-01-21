@@ -588,9 +588,26 @@ public class Table
      */
     private boolean typeCheck (Comparable [] t)
     { 
-        //  T O   B E   I M P L E M E N T E D 
+    	boolean isChecked = false;
+    	int counter = 0;
+    	if (t.size() == attribute.size())
+    	{
+    		for (int i = 0; i < t.size(); i++)
+    		{
+    			if (t[i].getClass() == domain[i].getClass())
+    			{
+    				counter++;
+    			}
+    		}
+    	}   	
+    	
+    	if (this.attribute.size() == counter)
+    	{
+    		isChecked = true;
+    	}
+    	//  T O   B E   I M P L E M E N T E D 
 
-        return true;
+        return isChecked;
     } // typeCheck
 
     /************************************************************************************
