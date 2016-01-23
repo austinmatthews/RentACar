@@ -173,34 +173,21 @@ public class Table
      */
     public Table select (KeyType keyVal)
     {
-        out.println ("RA> " + name + ".select (" + keyVal + ")");
+    	out.println ("RA> " + name + ".select (" + keyVal + ")");
 
-        List <Comparable []> rows = new ArrayList <> ();
- 
-        try
-        {
-        	if (this.index.get(keyVal) != null)
-        	{
-        		rows.add(this.index.get(keyVal));
-        	}
-        }
-        catch (Exception e)
-        {
-        	System.out.println("Error Table.java:Select(KeyType keyVal)." );
-        	System.out.println("See stack trace.\n");
-        	e.printStackTrace();
-        }
-//        Comparable [] tup;
-//    	for (int t = 0; t < this.tuples.size(); t++)
-//        {
-//        	tup = this.index.get(keyVal);
-//        	
-//        	rows.add(tup);
-//        }
+    	//An array list used to instantiate a new table to be returned at the completion of Select method.
+    	List <Comparable []> rows = new ArrayList <> ();
+    	
+    	//Check to see if the keyVal is in the index mapping.
+    	if (this.index.get(keyVal) != null)
+    	{
+    		//If keyVal is in the index mapping, we want to add that tuple to the current table.
+    		rows.add(this.index.get(keyVal));
+    	}
 
-        //  T O   B E   I M P L E M E N T E D 
-
-        return new Table (name + count++, attribute, domain, key, rows);
+    	//If the keyVal was not in the index mapping, then the returned table will be empty.
+    	//The columns of the new table will match the columns of this table.
+    	return new Table (name + count++, attribute, domain, key, rows);
     } // select
 
     /************************************************************************************
@@ -616,17 +603,18 @@ public class Table
     	//Check to see if the length of the given tuple matches the length of the tuples in this table.
     	if (t.length == this.attribute.length)
     	{
+    		//Cycle through the types of the given tuple and the types in this table.
     		for (int i = 0; i < t.length; i++)
     		{
-    			//Check to see if the classes of the columns in the tuples match.
-//    			System.out.println("t[i].getClass()\t" + t[i].getClass());
-//    			System.out.println("this.domain.getClass()\t" + this.domain[i]);
+    			//Check to see if the classes (types) of the columns in the tuples match.
     			if (t[i].getClass().equals(this.domain[i]))
     			{
     				isChecked = true;
     			}
+    			//If they do not match at any point, the else block below is executed.
     			else
     			{
+    				//Set isChecked to false since tuples do not match and set i such that the for loop is terminated leaving the value of isChecked as false.
     				isChecked = false;
     				i = t.length + 1;
     			}
@@ -634,7 +622,6 @@ public class Table
     	}   	
 
     	return isChecked;
-//    	return true;
     } // typeCheck
 
     /************************************************************************************
