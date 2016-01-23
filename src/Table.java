@@ -599,30 +599,31 @@ public class Table
      */
     private boolean typeCheck (Comparable [] t)
     { 
-    	boolean isChecked = false;
-
-    	//Check to see if the length of the given tuple matches the length of the tuples in this table.
-    	if (t.length == this.attribute.length)
-    	{
-    		//Cycle through the types of the given tuple and the types in this table.
-    		for (int i = 0; i < t.length; i++)
-    		{
-    			//Check to see if the classes (types) of the columns in the tuples match.
-    			if (t[i].getClass().equals(this.domain[i]))
-    			{
-    				isChecked = true;
-    			}
-    			//If they do not match at any point, the else block below is executed.
-    			else
-    			{
-    				//Set isChecked to false since tuples do not match and set i such that the for loop is terminated leaving the value of isChecked as false.
-    				isChecked = false;
-    				i = t.length + 1;
-    			}
-    		}
-    	}   	
-
-    	return isChecked;
+//    	boolean isChecked = false;
+//
+//    	//Check to see if the length of the given tuple matches the length of the tuples in this table.
+//    	if (t.length == this.attribute.length)
+//    	{
+//    		//Cycle through the types of the given tuple and the types in this table.
+//    		for (int i = 0; i < t.length; i++)
+//    		{
+//    			//Check to see if the classes (types) of the columns in the tuples match.
+//    			if (t[i].getClass().equals(this.domain[i]))
+//    			{
+//    				isChecked = true;
+//    			}
+//    			//If they do not match at any point, the else block below is executed.
+//    			else
+//    			{
+//    				//Set isChecked to false since tuples do not match and set i such that the for loop is terminated leaving the value of isChecked as false.
+//    				isChecked = false;
+//    				i = t.length + 1;
+//    			}
+//    		}
+//    	}   	
+//
+//    	return isChecked;
+    	return true;
     } // typeCheck
 
     /************************************************************************************

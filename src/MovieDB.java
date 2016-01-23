@@ -120,6 +120,12 @@ class MovieDB
         out.println ();
         Table t_iselect = movieStar.select (new KeyType ("Harrison_Ford"));
         t_iselect.print ();
+        
+        out.println ();
+        Table t_iselect2 = movie.select (new KeyType ("Rambo"));
+        t_iselect2.print ();
+        
+
 
         //--------------------- union: movie UNION cinema
 
@@ -144,6 +150,7 @@ class MovieDB
         out.println ();
         Table t_join2 = movie.join (cinema);
         t_join2.print ();
+      
 
     } // main
 
