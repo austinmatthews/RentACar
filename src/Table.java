@@ -372,6 +372,7 @@ public class Table
                         tupleMatch = true;
                     } else {
                         tupleMatch = false;
+			break;
                     }                   
                 }
                     ////////
