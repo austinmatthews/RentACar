@@ -611,29 +611,30 @@ public class Table
      */
     private boolean typeCheck (Comparable [] t)
     { 
-//      	boolean isChecked = false;
-//    	int counter = 0;
-//    	
-//    	//Check to see if the length of the given tuple matches the length of the tuples in this table.
-//    	if (t.length == this.attribute.length)
-//    	{
-//    		for (int i = 0; i < t.length; i++)
-//    		{
-//    			//Check to see if the classes of the columns in the tuples match.
-//    			if (t[i].getClass().equals(this.domain.getClass()))
-//    			{
-//    				isChecked = true;
-//    			}
-//    			else
-//    			{
-//    				isChecked = false;
-//    				i = t.length + 1;
-//    			}
-//    		}
-//    	}   	
-//    	
-//        return isChecked;
-    	return true;
+    	boolean isChecked = false;
+
+    	//Check to see if the length of the given tuple matches the length of the tuples in this table.
+    	if (t.length == this.attribute.length)
+    	{
+    		for (int i = 0; i < t.length; i++)
+    		{
+    			//Check to see if the classes of the columns in the tuples match.
+//    			System.out.println("t[i].getClass()\t" + t[i].getClass());
+//    			System.out.println("this.domain.getClass()\t" + this.domain[i]);
+    			if (t[i].getClass().equals(this.domain[i]))
+    			{
+    				isChecked = true;
+    			}
+    			else
+    			{
+    				isChecked = false;
+    				i = t.length + 1;
+    			}
+    		}
+    	}   	
+
+    	return isChecked;
+//    	return true;
     } // typeCheck
 
     /************************************************************************************
