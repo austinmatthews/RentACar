@@ -140,10 +140,16 @@ implements Serializable
 		Class []  colDomain = extractDom (match (attrs), domain);
 		String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
+		int [] colPos = match(attrs);
+		Comparable[] temp = null;
 		List <Comparable []> rows = new ArrayList <> ();
-
-		//  T O   B E   I M P L E M E N T E D 
-
+		
+		for (int i = 0; i < this.tuples.size(); i++){
+			for(int j = 0; j < colPos.length; j++)
+				temp[j] = this.tuples.get(i)[colPos[j]];
+			rows.add(temp);
+		}
+		
 		return new Table (name + count++, attrs, colDomain, newKey, rows);
 	} // project
 
@@ -159,8 +165,7 @@ implements Serializable
 	{
 		out.println ("RA> " + name + ".select (" + predicate + ")");
 
-		return new Table (name + count++, attribute, domain, key,
-				tuples.stream ().filter (t -> predicate.test (t))
+		return new Table (name + count++, attribute, domain, key, tuples.stream ().filter (t -> predicate.test (t))
 				.collect (Collectors.toList ()));
 	} // select
 
