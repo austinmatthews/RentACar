@@ -141,10 +141,10 @@ implements Serializable
 		String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
 		int [] colPos = match(attrs);
-		Comparable[] temp = null;
 		List <Comparable []> rows = new ArrayList <> ();
 		
 		for (int i = 0; i < this.tuples.size(); i++){
+			Comparable[] temp = new Comparable[attrs.length];
 			for(int j = 0; j < colPos.length; j++)
 				temp[j] = this.tuples.get(i)[colPos[j]];
 			rows.add(temp);
@@ -182,14 +182,15 @@ implements Serializable
 
 		//An array list used to instantiate a new table to be returned at the completion of Select method.
 		List <Comparable []> rows = new ArrayList <> ();
-
+		
+		
 		//Check to see if the keyVal is in the index mapping.
 		if (this.index.get(keyVal) != null)
 		{
 			//If keyVal is in the index mapping, we want to add that tuple to the current table.
 			rows.add(this.index.get(keyVal));
 		}
-
+		
 		//If the keyVal was not in the index mapping, then the returned table will be empty.
 		//The columns of the new table will match the columns of this table.
 		return new Table (name + count++, attribute, domain, key, rows);
