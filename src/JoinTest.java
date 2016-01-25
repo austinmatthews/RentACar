@@ -43,8 +43,13 @@ class JoinTest{
         natural_join.print ();
 
         out.println ();
-        Table wrong_join = movie.join("genre", "somethingElse", cinema);
+        Table wrong_join = movie.join("somethingElse", "studioName", cinema);
         wrong_join.print ();
+        out.println("This should be an empty table^^\n");
+
+        out.println ();
+        Table wrong_join2 = movie.join("genre", "wrongAttr", cinema);
+        wrong_join2.print ();
         out.println("This should be an empty table^^\n");
 
 

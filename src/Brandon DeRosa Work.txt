@@ -1,0 +1,20 @@
+Brandon DeRosa
+CSCI 4370 Database
+Team Leader: Lauren Clapper
+
+For project 1 I was tasked with implementing both of the join methods. They were equ-join and natural join.
+The equ-join joins tables based on matching attributes given by the user in a query. 
+Natural join joins two tables based on all of their matching attributes. If there are multiple attributes
+in each table that are the same, then all tuple values in each table for the corresponding attribute columns
+must be equal. The remaining attributes in table2 are labeled as mismatched, and concatenated to the attributes
+in table1. Also the domain lists are concatenated, and the tuples as well. The duplicate columns are also
+eliminated in the new table. The only file I modified was the Table.java file. I provided a JoinTest.java file
+to test the join methods. The complete list of files modified/created --
+   -Table.java
+   -MovieDB.java
+   -JoinTest.java
+
+If table2 in either join is null, then table1 is returned. If an attribute in equ-join is not part of it's 
+respective table, then it will cause an ArrayIndexOutOfBoundsException, which will be caught and an empty table
+is returned. The dimensions of the new table are based on the concatenation of both attributes and both domains. 
+Also in the natural join, there is check so that are no duplicate attributes and no duplicate tuples either. 

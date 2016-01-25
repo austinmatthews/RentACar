@@ -274,6 +274,12 @@ implements Serializable
 	@SuppressWarnings("unchecked")
 	public Table join (String attributes1, String attributes2, Table table2)
 	{
+
+		// if table2 is null, then return table1
+		if(table2 == null){
+			return this;
+		}
+
 		out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
 				+ table2.name + ")");
 
@@ -283,14 +289,17 @@ implements Serializable
 			String [] t_attrs = attributes1.split (" ");
 			String [] u_attrs = attributes2.split (" ");
 
+			//find column positions of each attribute
 			Comparable[] temp = null;
 			int col1 = col(attributes1);
 			int col2 = table2.col(attributes2);
 
+			//iterate over both tables to check if the tuple value at matching attribute position are equal
 			for(int i = 0; i < table2.tuples.size(); i++){
 				for(int j = 0; j < tuples.size(); j++){
 
 					int result = table2.tuples.get(i)[col2].compareTo(tuples.get(j)[col1]);
+					// if there are equal then add them to the new table
 					if(result == 0){
 
 						temp = ArrayUtil.concat(tuples.get(j), table2.tuples.get(i));
@@ -301,6 +310,7 @@ implements Serializable
 				}
 			}
 
+			//concatenate 2 to end of attribute name if they are duplicates
 			for(int x = 0; x < table2.attribute.length; x++){
 				for(int y = 0; y < attribute.length; y++){
 
@@ -316,6 +326,8 @@ implements Serializable
 					ArrayUtil.concat (domain, table2.domain), key, rows);
 
 		} catch(ArrayIndexOutOfBoundsException e){
+			// there is an ArrayIndexOutOfBoundsException thrown if one/both of the attributes provided
+			// are not found in their respective tables
 			System.out.println("\nCheck Query");
 			System.out.println("One Or More Specified Attributes Are Incorrect\n");
 			System.out.println("Table 1 Attribute: " + attributes1);
@@ -339,19 +351,23 @@ implements Serializable
 	@SuppressWarnings("unchecked")
 	public Table join (Table table2)
 	{
-		out.println ("RA> " + name + ".join (" + table2.name + ")");
 
+		// return this if table2 is null
         if(table2 == null){
             return this;
         }
+
+        out.println ("RA> " + name + ".join (" + table2.name + ")");
         
 		List <Comparable []> rows = new ArrayList <> ();
 
+		//keep track of attr that match or mismatch
 		ArrayList<String> matching = new ArrayList<String>();
 		ArrayList<String> mismatch = new ArrayList<String>();
 
 		boolean match = false;
 
+		//iterate over both tables to find matching and mismatching attributes
 		for(int i = 0; i < table2.attribute.length; i++){
 			match = false;
 			for(int j = 0; j < attribute.length; j++){
@@ -372,16 +388,15 @@ implements Serializable
 
 		}
 
+		// List of rows that have been added from each table
 		ArrayList<Integer> added1 = new ArrayList<Integer>();
 		ArrayList<Integer> added2 = new ArrayList<Integer>();
 		Comparable[] temp = new Comparable[mismatch.size()];
 
-		System.out.println(mismatch.size());
-
+		// Iterate over each table
 		for(int j = 0; j < tuples.size(); j++){
 			for(int k = 0; k < table2.tuples.size(); k++){
 
-				///////
 				boolean tupleMatch = false;
 				// Change to Loop through all of ArrayList -> Matching
 				for(int m = 0; m < matching.size(); m++){
@@ -394,8 +409,9 @@ implements Serializable
 						break;
 					}                   
 				}
-				////////
 
+				// if all the values match the other table at the corresponding matching attributes
+				// and both rows have not already been added
 				if(tupleMatch == true){
 
 					if(!(added1.contains(j)) && !(added2.contains(k))){
@@ -403,12 +419,14 @@ implements Serializable
 						added1.add(j);
 						added2.add(k);
 
+						//create a new tuple from table2
 						for(int z = 0; z < mismatch.size(); z++){
 
 							temp[z] = table2.tuples.get(k)[table2.col(mismatch.get(z))];
 
 						}
 
+						//add the tuple
 						rows.add(ArrayUtil.concat(tuples.get(j), temp));
 
 					}
@@ -421,10 +439,10 @@ implements Serializable
 		int[] colPos = new int[mismatch.size()];
 		for(int index = 0; index < mismatch.size(); index++){
 			colPos[index] = table2.col(mismatch.get(index));
-		}
+		} // get the column positions for extractDomain method
 
 		String[] mm = new String[mismatch.size()];
-		mismatch.toArray(mm);
+		mismatch.toArray(mm); //get mismatched attributes
 
 		return new Table (name + count++, ArrayUtil.concat (attribute, mm),
 				ArrayUtil.concat (domain, table2.extractDom(colPos, table2.domain)), key, rows);
