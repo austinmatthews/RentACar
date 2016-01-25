@@ -324,6 +324,11 @@ public class Table
     @SuppressWarnings("unchecked")
     public Table join (Table table2)
     {
+
+        if(table2 == null){
+            return this;
+        }
+        
         out.println ("RA> " + name + ".join (" + table2.name + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
