@@ -140,13 +140,18 @@ implements Serializable
 		Class []  colDomain = extractDom (match (attrs), domain);
 		String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
+		//Get int array with column numbers of the categories to keep
 		int [] colPos = match(attrs);
 		List <Comparable []> rows = new ArrayList <> ();
 		
+		//Loop through each row in the table
 		for (int i = 0; i < this.tuples.size(); i++){
+			//Create an empty temporary array the length of the amount of attributes we want to keep
 			Comparable[] temp = new Comparable[attrs.length];
+			//Get the attribute in the tuple in position corresponding to position j of colPos and store in position j of temp
 			for(int j = 0; j < colPos.length; j++)
 				temp[j] = this.tuples.get(i)[colPos[j]];
+			//Add temp to our rows
 			rows.add(temp);
 		}
 		
