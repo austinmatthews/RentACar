@@ -160,9 +160,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     public SortedMap <K,V> headMap (K toKey)
     {
-        //  T O   B E   I M P L E M E N T E D
-
-        return null;
+        return subMap(firstKey(), toKey);
     } // headMap
 
     /********************************************************************************
@@ -171,9 +169,10 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     public SortedMap <K,V> tailMap (K fromKey)
     {
-        //  T O   B E   I M P L E M E N T E D
+        SortedMap<K,V> tail = subMap(fromKey, lastKey());
+        tail.put(lastKey(),get(lastKey()));
 
-        return null;
+        return tail;
     } // tailMap
 
     /********************************************************************************
@@ -181,11 +180,29 @@ public class BpTreeMap <K extends Comparable <K>, V>
      * i.e., fromKey <= key < toKey.
      * @return  the submap with keys in the range [fromKey, toKey)
      */
-    public SortedMap <K,V> subMap (K fromKey, K toKey)
+    @SuppressWarnings("unchecked")
+	public SortedMap <K,V> subMap (K fromKey, K toKey)
     {
-        //  T O   B E   I M P L E M E N T E D
-
-        return null;
+        SortedMap<K,V> sub = new TreeMap<>();
+        Node temp = root;
+        //traverse down the left side of the tree
+        //can make this more efficient by searching instead for the correct node to start at
+        //and stopping when we get to toKey instead of iterating through every leaf node.
+        //I don't think this really matters though, I think it just has to be implemented to 
+        //extend SortedMap
+        while (!temp.isLeaf){
+        	temp = (Node) temp.ref[0];
+        }
+        do {
+        	for (int i=0; i<4; i++){
+        		if (temp.key[i]!=null && fromKey.compareTo(temp.key[i]) > 0 && temp.key[i].compareTo(toKey) < 0) {
+        			sub.put(temp.key[i], (V) temp.ref[i]);
+        		}
+        	}
+        	temp = (Node) temp.ref[4];
+        }
+        while (temp.ref[4]!= null);
+        return sub;
     } // subMap
 
     /********************************************************************************
