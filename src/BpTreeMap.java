@@ -136,22 +136,32 @@ public class BpTreeMap <K extends Comparable <K>, V>
      * Return the first (smallest) key in the B+Tree map.
      * @return  the first key in the B+Tree map.
      */
-    public K firstKey () 
+    @SuppressWarnings("unchecked")
+	public K firstKey () 
     {
-        //  T O   B E   I M P L E M E N T E D
+    	Node temp = root;
+        //traverse down the left side of the tree
+        while (!temp.isLeaf){
+        	temp = (Node) temp.ref[0];
+        }
+        return temp.key[0];
 
-        return null;
     } // firstKey
 
     /********************************************************************************
      * Return the last (largest) key in the B+Tree map.
      * @return  the last key in the B+Tree map.
      */
-    public K lastKey () 
+    @SuppressWarnings("unchecked")
+	public K lastKey () 
     {
-        //  T O   B E   I M P L E M E N T E D
+    	Node temp = root;
+        //traverse down the right side of the tree
+        while (!temp.isLeaf){
+        	temp = (Node) temp.ref[temp.nKeys];
+        }
+        return temp.key[temp.nKeys];
 
-        return null;
     } // lastKey
 
     /********************************************************************************
@@ -194,14 +204,16 @@ public class BpTreeMap <K extends Comparable <K>, V>
         	temp = (Node) temp.ref[0];
         }
         do {
-        	for (int i=0; i<4; i++){
+        	int i=0;
+        	while (i<temp.nKeys){
         		if (temp.key[i]!=null && fromKey.compareTo(temp.key[i]) > 0 && temp.key[i].compareTo(toKey) < 0) {
         			sub.put(temp.key[i], (V) temp.ref[i]);
         		}
+        		i++;
         	}
-        	temp = (Node) temp.ref[4];
+        	temp = (Node) temp.ref[i];
         }
-        while (temp.ref[4]!= null);
+        while (temp.ref[temp.nKeys]!= null);
         return sub;
     } // subMap
 
@@ -213,9 +225,21 @@ public class BpTreeMap <K extends Comparable <K>, V>
     {
         int sum = 0;
 
-        //  T O   B E   I M P L E M E N T E D
+        Node temp = root;
+        //traverse down the left side of the tree
+        while (!temp.isLeaf){
+        	temp = (Node) temp.ref[0];
+        }
+        
+        //then count keys in each node
+        while(temp.ref[temp.nKeys]!= null){
+        	sum += temp.nKeys;
+        	temp = (Node) temp.ref[temp.nKeys];
+        }
+        
+        sum += temp.nKeys;
+        return sum;
 
-        return  sum;
     } // size
 
     /********************************************************************************
