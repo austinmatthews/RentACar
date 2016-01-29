@@ -372,9 +372,61 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     private Node splitL (K key, V ref, Node n)
     {
+        //Per Jinze Li ignore changes to parent node.
+
         out.println ("splitL not implemented yet");
         Node rt = new Node (true);
-
+        
+        //Begin ECH and KAH code
+        
+        //Psuedo-psuedo code
+        //split based on mid point.
+        //for i < MID; move n.ref[] values to rt.ref[]
+        //move n.ref[] values to beginning so that MID value is in ref[1]
+        //determine which node (key, value) belong in
+        //insert them into that node using wedgeL
+        //The End???
+        
+        int j = MID;
+        //This loop will split our key array into two separate arrays at MID. We don't need to "delete" keys from n.key because the insert method only looks at the number of keys in the node (not the array size) i.e. we have some trash left over but it doesn't hurt us.
+        for (int i = 0; i < MID; i++) {
+            rt.key[i] = n.key[j];
+            j++;
+        }
+        
+        //Setting nKeys to MID on both nodes to indicate which positions of the array hold meaningful values.
+        rt.nKeys = MID;
+        n.nKeys = MID;
+        
+        //The next two loops will determine which node the key will be inserted into.
+        boolean foundHome = false;
+        //Check if the key belongs to the left node, n.
+        for (int i = 0; i < MID; i++) {
+            K k_n = n.key [i];
+            if (key.compareTo(k_n) <= 0) {
+                wedgeL( key, ref, n, i);
+                foundHome = true;
+                break;
+            }
+        }
+        
+        //Check if the key belongs to the right node, rt.
+        if (!foundHome){
+            for (int i = 0; i < MID; i++) {
+                K k_rt = rt.key [i];
+                if (key.compareTo(k_rt) <= 0) {
+                    wedgeL( key, ref, rt, i);
+                    foundHome = true;
+                    break;
+                }
+            }
+            //If foundHome is still false, key is the greatest value in either node and needs to be inserted at the end of node rt.
+            if(!foundHome) {
+                wedgeL( key, ref, rt, MID);
+            }
+        }
+        
+        //End ECH and KAH code.
         //  T O   B E   I M P L E M E N T E D
 
         return rt;
