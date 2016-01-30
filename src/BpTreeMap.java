@@ -530,19 +530,34 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Split internal node n and return the newly created right sibling node rt.
 	 * Split first (MID keys for node n and MID-1 for node rt), then add the new key and ref.
 	 * @param key  the new key to insert
-	 * @param ref  the new value/node to insert
-	 * @param n    the current node
-	 * @return  the right sibling node (may wish to provide more information)
-	 */
-	private Node splitI (K key, V ref, Node n)
-	{
-		out.println ("splitI not implemented yet");
-		Node rt = new Node (false);
+     * @param tupleRef  the new value/node to insert
+     * @param n    the current node
+     * @return  the right sibling node (may wish to provide more information)
+     */
+    private Node splitI (K key, V tupleRef, Node n)
+    {
+        out.println ("splitI not implemented yet");
+        Node rt = new Node (false);
 
-		//  T O   B E   I M P L E M E N T E D
+        
+        //Begin ECH and KAH code.
+        
+        //Still need to consider root and what happens when it splits.
+        //Handle in splitI by checking if node to be split is the root.
+        
+        
+        
+        //End ECH and KAH code.
+        
+        //  T O   B E   I M P L E M E N T E D
+        
 
-		return rt;
-	} // splitI
+        
+    
+
+        return rt;
+    } // splitI
+
 
 	/********************************************************************************
 	 * The main method used for testing.
