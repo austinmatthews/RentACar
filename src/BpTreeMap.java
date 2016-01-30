@@ -443,11 +443,11 @@ public class BpTreeMap <K extends Comparable <K>, V>
     /********************************************************************************
      * Wedge the key-ref pair into internal node n.
      * @param key  the key to insert
-     * @param ref  the value/node to insert
+     * @param tupleRef  the value/node to insert
      * @param n    the current node
      * @param i    the insertion position within node n
      */
-    private void wedgeI (K key, V ref, Node n, int i)
+    private void wedgeI (K key, V tupleRef, Node n, int i)
     {
         out.println ("wedgeI not implemented yet");
 
