@@ -295,6 +295,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     private Node insert (K key, V ref, Node n)
     {
+    	Node returnNode = n;
         boolean inserted = false;
         if (n.isLeaf) {                                  // handle leaf node
 
@@ -326,7 +327,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
         } // if
 
         if (DEBUG) print (root, 0);
-        return null;                                     // FIX: return useful information
+        return returnNode;                                     // FIX: return useful information
     } // insert
 
     /********************************************************************************
