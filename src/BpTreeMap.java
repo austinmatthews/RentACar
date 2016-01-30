@@ -424,20 +424,21 @@ public class BpTreeMap <K extends Comparable <K>, V>
     /********************************************************************************
      * Wedge the key-ref pair into leaf node n.
      * @param key  the key to insert
-     * @param ref  the value/node to insert
+     * @param tupleRef  the value/node to insert
      * @param n    the current node
      * @param i    the insertion position within node n
      */
-    private void wedgeL (K key, V ref, Node n, int i)
+    private void wedgeL (K key, V tupleRef, Node n, int i) 
     {
-        for (int j = n.nKeys; j > i; j--) {
-            n.key [j] = n.key [j-1];
-            n.ref [j] = n.ref [j-1];
+        for (int j = n.nKeys; j > i; j--) { 
+            n.key [j] = n.key [j-1]; 
+            n.ref [j] = n.ref [j-1]; 
         } // for
-        n.key [i] = key;
-        n.ref [i] = ref;
-        n.nKeys++;
+        n.key [i] = key; 
+        n.ref [i] = tupleRef; 
+        n.nKeys++; 
     } // wedgeL
+
 
     /********************************************************************************
      * Wedge the key-ref pair into internal node n.
