@@ -298,7 +298,6 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		Node returnNode = n;
 		boolean inserted = false;
 		if (n.isLeaf) {                  // handle leaf node
-
 			if (n.nKeys < ORDER - 1) {      //handle leaf if it does not need to split
 				for (int i = 0; i < n.nKeys; i++) {
 					K k_i = n.key [i];
@@ -345,26 +344,24 @@ implements Serializable, Cloneable, SortedMap <K, V>
 			for (int i = 0; i < n.nKeys; i++) {
 				K k_n = n.key[i];
 				if (key.compareTo(k_n) <= 0) {
-					//go to child in ref[i]
-					newNode = insert(key, tupleRef, n.ref[i]);
+					//go to child in ref[i] to insert.
+					newNode = insert(key, tupleRef, (Node)n.ref[i]);
 					childIndex = i;
 					foundChild = true;
 					break;
 				}
 			}
+			//If the child has not been found, then the key > all the keys in n and must be inserted in the node pointed to by the last meaningful value
+			//in the ref array which will be at index n.nKeys.
 			if (!foundChild) {
-
-
-
-
-				newNode = insert(key, tupleRef, n.ref[n.nKeys]);
+				newNode = insert(key, tupleRef, (Node)n.ref[n.nKeys]);
 				childIndex = n.nKeys;
 				foundChild = true;
 			}
 
 			//if newNode is original child, parent does not change
 			//if newNode is right sibling, parent must wedge newNode.key[0]
-			//then possibility of parent splitting (divorce) must be addressed.
+			//Then possibility of parent splitting must be addressed.
 			//Is this syntax correct? Should it be !(newNode.equals(n.ref[childIndex])?
 			if (newNode != n.ref[childIndex]) {
 				inserted = false;
@@ -395,21 +392,11 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
 			}
 
-
-
 			//Still need to consider root and what happens when it splits.
 			//Handle in splitI by checking if node to be split is the root.
-
-
-
-
 			//Keep in mind that tuple is ONLY stored in leaf
 
-
-
-
 			//End ECH and KAH Code
-			//  T O   B E   I M P L E M E N T E D
 
 		} // if
 
