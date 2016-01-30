@@ -289,45 +289,136 @@ public class BpTreeMap <K extends Comparable <K>, V>
     /********************************************************************************
      * Recursive helper function for inserting a key in B+trees.
      * @param key  the key to insert
-     * @param ref  the value/node to insert
+     * @param tupleRef  the value/node to insert
      * @param n    the current node
      * @return  the node inserted into (may wish to return more information)
      */
-    private Node insert (K key, V ref, Node n)
+    private Node insert (K key, V tupleRef, Node n)
     {
     	Node returnNode = n;
         boolean inserted = false;
-        if (n.isLeaf) {                                  // handle leaf node
+        if (n.isLeaf) {                  // handle leaf node
 
-            if (n.nKeys < ORDER - 1) {
+            if (n.nKeys < ORDER - 1) {      //handle leaf if it does not need to split
                 for (int i = 0; i < n.nKeys; i++) {
                     K k_i = n.key [i];
                     if (key.compareTo (k_i) < 0) {
-                        wedgeL (key, ref, n, i);
+                        wedgeL (key, tupleRef, n, i);
                         inserted = true;
                         break;
-                    } else if (key.equals (k_i)) {
+                    }
+                    else if (key.equals (k_i)) {
                         out.println ("BpTreeMap.insert: attempt to insert duplicate key = " + key);
                         inserted = true;
                         break;
                     } // if
                 } // for
-                if (! inserted) wedgeL (key, ref, n, n.nKeys);
-            } else {
-                Node sib = splitL (key, ref, n);
-
-                //  T O   B E   I M P L E M E N T E D
-
+                if (! inserted) {
+                
+                    wedgeL (key, tupleRef, n, n.nKeys);
+                }
+            }
+            else {      //handle leaf if it needs to SPLIT!
+                
+                Node sib = splitL (key, tupleRef, n);
+                returnNode = sib;
+                
+                //Create new root if and only if n == root.
+                //This is the base case of splitting and will be reached the only the first time a node is split.
+                //Is this syntax correct? Should it be n.equals(root)?
+                if (n == root) {
+                    Node newRoot = new Node(false);
+                    root = newRoot;
+                }
             } // if
+        }
+        else {                                         // handle internal node
 
-        } else {                                         // handle internal node
+            //Begin ECH and KAH Code
 
+            Node newNode = null;
+            boolean foundChild = false;
+            int childIndex = 0;
+            //Need to find which child node the key belongs in
+            //Iterate through Node n's keys in order to determine which child the new key will be inserted into.
+            //Then call insert on that child node
+            for (int i = 0; i < nKeys; i++) {
+                K k_n = n.key[i];
+                if (key.compareTo(k_n) <= 0) {
+                    //go to child in ref[i]
+                    newNode = insert(key, tupleRef, n.ref[i]);
+                    childIndex = i;
+                    foundChild = true;
+                    break;
+                }
+            }
+            if (!foundChild) {
+                
+                
+                
+                
+                newNode = insert(key, tupleRef, n.ref[nKeys]);
+                childIndex = nKeys;
+                foundChild = true;
+            }
+            
+            //if newNode is original child, parent does not change
+            //if newNode is right sibling, parent must wedge newNode.key[0]
+            //then possibility of parent splitting (divorce) must be addressed.
+            //Is this syntax correct? Should it be !(newNode.equals(n.ref[childIndex])?
+            if (newNode != n.ref[childIndex]) {
+                inserted = false;
+                if (n.nKeys < ORDER - 1) {                  
+                    for (int i = 0; i < n.nKeys; i++) {
+                        K k_i = n.key [i]; 
+                        if (key.compareTo (k_i) < 0) { 
+                            Node rtChild = wedgeI(newNode.key[0], tupleRef, n, i);
+                            returnNode = rtChild;
+
+                            inserted = true;
+                            break;
+                        }
+                        else if (key.equals (k_i)) { 
+                            out.println ("BpTreeMap.insert: attempt to insert duplicate key = " + key);
+                            inserted = true;
+                            break;
+                        } // if
+                    } // for
+                    //If key has not been wedged in at this point, it needs to go into the last available spot of the node.
+                    if (! inserted) {
+                        Node rtChild = wedgeI(newNode.key[0], tupleRef, n, n.nKeys);
+                        returnNode = rtChild;
+                    }
+                }
+                //If the parent was full, then we need to split it.
+                else {
+                    Node sib = splitI (key, tupleRef, n);
+                    returnNode = sib;
+                }
+
+            }
+            
+            
+            
+            //Still need to consider root and what happens when it splits.
+            //Handle in splitI by checking if node to be split is the root.
+            
+            
+            
+            
+            //Keep in mind that tuple is ONLY stored in leaf
+            
+
+            
+            
+            //End ECH and KAH Code
             //  T O   B E   I M P L E M E N T E D
 
         } // if
 
         if (DEBUG) print (root, 0);
         return returnNode;                                     // FIX: return useful information
+
     } // insert
 
     /********************************************************************************
