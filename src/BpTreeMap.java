@@ -342,7 +342,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 			//Need to find which child node the key belongs in
 			//Iterate through Node n's keys in order to determine which child the new key will be inserted into.
 			//Then call insert on that child node
-			for (int i = 0; i < nKeys; i++) {
+			for (int i = 0; i < n.nKeys; i++) {
 				K k_n = n.key[i];
 				if (key.compareTo(k_n) <= 0) {
 					//go to child in ref[i]
@@ -357,8 +357,8 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
 
 
-				newNode = insert(key, tupleRef, n.ref[nKeys]);
-				childIndex = nKeys;
+				newNode = insert(key, tupleRef, n.ref[n.nKeys]);
+				childIndex = n.nKeys;
 				foundChild = true;
 			}
 
@@ -372,9 +372,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					for (int i = 0; i < n.nKeys; i++) {
 						K k_i = n.key [i]; 
 						if (key.compareTo (k_i) < 0) { 
-							Node rtChild = wedgeI(newNode.key[0], tupleRef, n, i);
-							returnNode = rtChild;
-
+							wedgeI(newNode.key[0], tupleRef, n, i);
 							inserted = true;
 							break;
 						}
@@ -386,8 +384,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					} // for
 					//If key has not been wedged in at this point, it needs to go into the last available spot of the node.
 					if (! inserted) {
-						Node rtChild = wedgeI(newNode.key[0], tupleRef, n, n.nKeys);
-						returnNode = rtChild;
+						wedgeI(newNode.key[0], tupleRef, n, n.nKeys);
 					}
 				}
 				//If the parent was full, then we need to split it.
