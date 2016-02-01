@@ -363,7 +363,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 			//if newNode is right sibling, parent must wedge newNode.key[0]
 			//Then possibility of parent splitting must be addressed.
 			//Is this syntax correct? Should it be !(newNode.equals(n.ref[childIndex])?
-			if (newNode != n.ref[childIndex]) {
+            if (!(newNode.equals(n.ref[childIndex]))) {
 				inserted = false;
 				if (n.nKeys < ORDER - 1) {                  
 					for (int i = 0; i < n.nKeys; i++) {
