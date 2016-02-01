@@ -80,6 +80,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param _classK  the class for keys (K)
 	 * @param _classV  the class for values (V)
 	 */
+	@SuppressWarnings("unchecked")
 	public BpTreeMap (Class <K> _classK, Class <V> _classV)
 	{
 		classK = _classK;
@@ -91,6 +92,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Return null to use the natural order based on the key type.  This requires the
 	 * key type to implement Comparable.
 	 */
+	@SuppressWarnings("unchecked")
 	public Comparator <? super K> comparator () 
 	{
 		return null;
@@ -100,6 +102,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Return a set containing all the entries as pairs of keys and values.
 	 * @return  the set view of the map
 	 */
+	@SuppressWarnings("unchecked")
 	public Set <Map.Entry <K, V>> entrySet ()
 	{
 		Set <Map.Entry <K, V>> enSet = new HashSet <> ();
@@ -126,6 +129,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param value  the value to insert
 	 * @return  null, not the previous value for this key
 	 */
+	@SuppressWarnings("unchecked")
 	public V put (K key, V value)
 	{
 		insert (key, value, root);
@@ -168,6 +172,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Return the portion of the B+Tree map where key < toKey.
 	 * @return  the submap with keys in the range [firstKey, toKey)
 	 */
+	@SuppressWarnings("unchecked")
 	public SortedMap <K,V> headMap (K toKey)
 	{
 		return subMap(firstKey(), toKey);
@@ -177,6 +182,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Return the portion of the B+Tree map where fromKey <= key.
 	 * @return  the submap with keys in the range [fromKey, lastKey]
 	 */
+	@SuppressWarnings("unchecked")
 	public SortedMap <K,V> tailMap (K fromKey)
 	{
 		SortedMap<K,V> tail = subMap(fromKey, lastKey());
@@ -221,6 +227,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Return the size (number of keys) in the B+Tree.
 	 * @return  the size of the B+Tree
 	 */
+	@SuppressWarnings("unchecked")
 	public int size ()
 	{
 		int sum = 0;
