@@ -293,6 +293,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param n    the current node
 	 * @return  the node inserted into (may wish to return more information)
 	 */
+	@SuppressWarnings("unchecked")
 	private Node insert (K key, V tupleRef, Node n)
 	{
 		Node returnNode = n;
@@ -412,6 +413,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param n    the current node
 	 * @param i    the insertion position within node n
 	 */
+	@SuppressWarnings("unchecked")
 	private void wedgeL (K key, V tupleRef, Node n, int i) 
 	{
 		for (int j = n.nKeys; j > i; j--) { 
@@ -431,6 +433,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param n    the current node
 	 * @param i    the insertion position within node n
 	 */
+	@SuppressWarnings("unchecked")
 	private void wedgeI (K key, V tupleRef, Node n, int i)
 	{
 		out.println ("wedgeI not implemented yet");
@@ -450,6 +453,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param n    the current node
 	 * @return  the right sibling node (may wish to provide more information)
 	 */
+	@SuppressWarnings("unchecked")
 	private Node splitL (K key, V ref, Node n)
 	{
 		//Per Jinze Li ignore changes to parent node.
@@ -521,6 +525,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
      * @param n    the current node
      * @return  the right sibling node (may wish to provide more information)
      */
+	@SuppressWarnings("unchecked")
     private Node splitI (K key, V tupleRef, Node n)
     {
         out.println ("splitI not implemented yet");
