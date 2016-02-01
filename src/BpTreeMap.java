@@ -434,6 +434,9 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	private void wedgeI (K key, V tupleRef, Node n, int i)
 	{
 		out.println ("wedgeI not implemented yet");
+		//Begin ECH and KAH code.
+        wedgeL(key, tupleRef, n, i);
+        //End ECH and KAH code.
 
 		//  T O   B E   I M P L E M E N T E D
 
