@@ -280,9 +280,32 @@ public class LinHashMap <K, V>
     {
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
-
-        //  T O   B E   I M P L E M E N T E D
-
+        
+        //Loop through each index of the hTable
+        for(int i = 0; i < hTable.size(); i++){
+        	//Print each index number
+        	out.print(i + ": ");
+        	//Get a bucket at index i
+        	Bucket temp = hTable.get(i);
+        	while(temp.next != null){
+        		out.print("[ ");
+        		//Loop through each index of the current bucket
+        		for(int h = 0; h < SLOTS; h++){
+        			//Print out the key at index h of the bucket
+        			out.print(temp.key[h] + ",");
+        		}
+        		out.print("] ----> ");
+        		temp = temp.next;
+        	}
+        	//There is now only one bucket left
+        	out.print("[ ");
+    		//Loop through each index of the current bucket
+    		for(int h = 0; h < SLOTS; h++){
+    			//Print out the key at index h of the bucket
+    			out.print(temp.key[h] + ",");
+    		}
+    		out.print("]\n");
+        }
         out.println ("-------------------------------------------");
     } // print
 
