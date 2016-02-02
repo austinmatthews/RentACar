@@ -495,6 +495,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		//This loop will split our key array into two separate arrays at MID. We don't need to "delete" keys from n.key because the insert method only looks at the number of keys in the node (not the array size) i.e. we have some trash left over but it doesn't hurt us.
 		for (int i = 0; i < MID; i++) {
 			rt.key[i] = n.key[j];
+			rt.ref[i] = n.ref[j];
 			j++;
 		}
 
@@ -583,12 +584,13 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		if (RANDOMLY) {
 			Random rng = new Random ();
 			for (int i = 1; i <= totalKeys; i += 2) bpt.put (rng.nextInt (2 * totalKeys), i * i);
-		} else {
+		} 
+		else {
 			for (int i = 1; i <= totalKeys; i += 2) bpt.put (i, i * i);
 		} // if
 
 		bpt.print (bpt.root, 0);
-		for (int i = 0; i <= totalKeys; i++) {
+		for (int i = 1; i <= totalKeys; i+=2) {
 			out.println ("key = " + i + " value = " + bpt.get (i));
 		} // for
 		out.println ("-------------------------------------------");
