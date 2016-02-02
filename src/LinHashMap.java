@@ -133,6 +133,8 @@ public class LinHashMap <K, V>
      */
     public V put (K key, V value)
     {
+        //if(get(key) == null) return null
+
         //init
         if(hTable.size() == 0){
             for(int i = 0; i < 4; i++){
@@ -162,7 +164,6 @@ public class LinHashMap <K, V>
             removeExtra(bucket);
         }
 
-        // isEndRound()
         isEndRound();
 
         return null;

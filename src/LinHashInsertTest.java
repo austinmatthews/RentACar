@@ -15,14 +15,13 @@ public class LinHashInsertTest{
 			fours+=4;
 		}
 
-
-		//map.print();
+		map.print();
 		map.entrySet();
 
 		LinHashMap<Integer, Integer> map2 = new LinHashMap<>(Integer.class, Integer.class);
 
-		//for(int j = 0; j < 50; j++) map2.put(j, j*j);
-		//map2.print();
+		for(int j = 0; j < 50; j++) map2.put(j, j*j);
+		map2.print();
 
 	}
 
