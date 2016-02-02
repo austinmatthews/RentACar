@@ -1,6 +1,6 @@
 
 /************************************************************************************
- * @file LinHashMap.java
+ * @file LinHashMap.java    
  *
  * @author  John Miller
  */
@@ -93,8 +93,21 @@ public class LinHashMap <K, V>
     {
         Set <Map.Entry <K, V>> enSet = new HashSet <> ();
 
-        //  T O   B E   I M P L E M E N T E D
+        Map <K, V> map = new HashMap<K, V>();
+
+        for(int i = 0; i < hTable.size(); i++){
+            Bucket b = hTable.get(i);
+            while(b != null){
+                for(int j = 0; j < b.nKeys; j++){
+                    map.put(b.key[j], b.value[j]);
+                }
+                b = b.next;
+            }
+        }
             
+        enSet = map.entrySet();
+        System.out.println(enSet);
+
         return enSet;
     } // entrySet
 
@@ -120,13 +133,135 @@ public class LinHashMap <K, V>
      */
     public V put (K key, V value)
     {
-        int i = h (key);
-        out.println ("LinearHashMap.put: key = " + key + ", h() = " + i + ", value = " + value);
+        //init
+        if(hTable.size() == 0){
+            for(int i = 0; i < 4; i++){
+                hTable.add(new Bucket(null));
+            }
+        }
 
-        //  T O   B E   I M P L E M E N T E D
+        int mod = h(key);
+        if(mod < split) mod = h2(key);
+        Bucket bucket = hTable.get(mod);
+
+        out.println ("LinearHashMap.put: key = " + key + ", h() = " + mod + ", value = " + value);
+
+        int num  = hTable.get(mod).nKeys;
+        boolean overflow = true;
+
+        if(num < 4){
+            bucket.key[num]   = key;
+            bucket.value[num] = value;
+            overflow = false;
+            bucket.nKeys++;
+        }
+
+        if(overflow){
+            insertOverflow(hTable.get(mod), key, value);
+            handleOverFlow();
+            removeExtra(bucket);
+        }
+
+        // isEndRound()
+        isEndRound();
 
         return null;
     } // put
+
+    /**
+    * Checks to see if it is the end of the round table size =  mod2
+    */
+    public void isEndRound(){
+        if(hTable.size() % mod2 == 0){
+            split = 0;
+            mod1 = mod2;
+            mod2 = mod2 * 2;
+            System.out.println("Mod1: " + mod1);
+            System.out.println("Mod2: " + mod2);
+        }
+    }
+
+    /**
+    * Removes the extra buckets after a overflow insert
+    * @param remove - the bucket at mod to check if there are empty overflow buckets
+    */
+    public void removeExtra(Bucket remove){
+        while(remove.next != null){
+            if(remove.next.nKeys == 0){
+                remove.next = null;
+                break;
+            }
+            remove = remove.next;
+        }
+    }
+
+    /**
+    * Insert an ley-value that will result in overflow
+    * @param row - the current bucket to insert to
+    * @param key - the key to insert
+    * @param value - the value to insert
+    */
+    public void insertOverflow(Bucket row, K key, V value){
+        if(row.next == null){
+            row.next = new Bucket(null);
+            row.next.key[0]   = key;
+            row.next.value[0] = value;
+            row.next.nKeys++;
+        } else {
+            if(row.next.nKeys < 4){
+                row.next.key[row.next.nKeys] = key;
+                row.next.value[row.next.nKeys] = value;
+                row.next.nKeys++;
+            } else {
+                insertOverflow(row.next, key, value);
+            }
+
+        }
+    }
+
+    /**
+    * Handles the rehashing of all the values in the bucket as well as in it's overflow bucket
+    */
+    public void handleOverFlow(){
+        hTable.add(new Bucket(null));
+        Bucket temp = hTable.get(split);
+        ArrayList<K> tempKeys = new ArrayList<K>();
+        ArrayList<V> tempVals = new ArrayList<V>();
+        while(temp != null){
+            for(int k = 0; k < SLOTS; k++){
+                if(temp.key[k] != null){
+                    tempKeys.add(temp.key[k]);   temp.key[k]   = null; temp.nKeys--;
+                    tempVals.add(temp.value[k]); temp.value[k] = null; 
+                }
+            }
+            temp = temp.next;
+        }
+        int index1 = 0; int index2 = 0;
+        Bucket tempMod1 = hTable.get(split);
+        Bucket tempMod2 = hTable.get(split + mod1);
+        if(!tempKeys.isEmpty()){
+            for(int m = 0; m < tempKeys.size(); m++){
+                if(h2(tempKeys.get(m)) == split){
+                    for(int i = 0; i < Math.floor(index1/SLOTS); i++){
+                        tempMod1 = tempMod1.next;
+                    }
+                    tempMod1.key[index1 % SLOTS] = tempKeys.get(m);
+                    tempMod1.value[index1 % SLOTS] = tempVals.get(m);
+                    tempMod1.nKeys++;
+                    index1++;
+                } else {
+                    for(int i = 0; i < Math.floor(index2/SLOTS); i++){
+                        tempMod2 = tempMod2.next;
+                    }
+                    tempMod2.key[index2 % SLOTS]  = tempKeys.get(m);
+                    tempMod2.value[index2 % SLOTS] = tempVals.get(m);
+                    tempMod2.nKeys++;
+                    index2++;
+                }
+            }
+        }
+        split++;
+    }
 
     /********************************************************************************
      * Return the size (SLOTS * number of home buckets) of the hash table. 
@@ -136,6 +271,7 @@ public class LinHashMap <K, V>
     {
         return SLOTS * (mod1 + split);
     } // size
+
 
     /********************************************************************************
      * Print the hash table.
@@ -149,6 +285,7 @@ public class LinHashMap <K, V>
 
         out.println ("-------------------------------------------");
     } // print
+
 
     /********************************************************************************
      * Hash the key using the low resolution hash function.

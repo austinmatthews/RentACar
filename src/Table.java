@@ -279,7 +279,6 @@ implements Serializable
 	@SuppressWarnings("unchecked")
 	public Table join (String attributes1, String attributes2, Table table2)
 	{
-
 		// if table2 is null, then return table1
 		if(table2 == null){
 			return this;
@@ -316,6 +315,9 @@ implements Serializable
 			}
 
 			//concatenate 2 to end of attribute name if they are duplicates
+
+			//find way to merge the 2 nested for loops
+
 			for(int x = 0; x < table2.attribute.length; x++){
 				for(int y = 0; y < attribute.length; y++){
 
@@ -391,7 +393,7 @@ implements Serializable
 
 			}
 
-		}
+		} //this could be removed 
 
 		// List of rows that have been added from each table
 		ArrayList<Integer> added1 = new ArrayList<Integer>();
@@ -417,7 +419,7 @@ implements Serializable
 
 				// if all the values match the other table at the corresponding matching attributes
 				// and both rows have not already been added
-				if(tupleMatch == true){
+				if(tupleMatch == true){ //change to set {}
 
 					if(!(added1.contains(j)) && !(added2.contains(k))){
 
