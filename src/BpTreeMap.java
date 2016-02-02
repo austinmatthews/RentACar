@@ -326,9 +326,11 @@ implements Serializable, Cloneable, SortedMap <K, V>
 				}
 			}
 			else {      //handle leaf if it needs to SPLIT!
-
+				System.out.println("Begin else: handling leaf when it needs to split");
 				Node sib = splitL (key, tupleRef, n);
 				returnNode = sib;
+
+				System.out.println("Middle (before handling root) else: handling leaf when it needs to split");
 
 				//Create new root if and only if n == root.
 				//This is the base case of splitting and will be reached the only the first time a node is split.
@@ -336,7 +338,15 @@ implements Serializable, Cloneable, SortedMap <K, V>
 				if (n == root) {
 					Node newRoot = new Node(false);
 					root = newRoot;
+					root.key[0] = n.key[MID - 1];
+					root.nKeys++;
+					root.ref[0] = n;
+					root.ref[1] = sib;
+					System.out.println("\n\nMaking new root");
+
 				}
+				System.out.println("End else: handling leaf when it needs to split");
+
 			} // if
 		}
 		else {                                         // handle internal node
@@ -408,7 +418,10 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
 		} // if
 
-		if (DEBUG) print (root, 0);
+		if (DEBUG) {
+			System.out.println("Inserting key = " + key);
+			print (root, 0);
+		}
 		return returnNode;                                     // FIX: return useful information
 
 	} // insert
