@@ -118,10 +118,30 @@ public class LinHashMap <K, V>
      */
     public V get (Object key)
     {
+    	//Gives index of where the key is
         int i = h (key);
-
-        //  T O   B E   I M P L E M E N T E D
-
+        //Gets the index if the original bucket has been split already
+        if(i < split){
+        	i = h2(key);
+        }
+        //Get the bucket in hTable at index i
+        Bucket temp = hTable.get(i);
+        
+        //If the bucket does not have any keys than there can be no values so return null
+        if (temp.nKeys == 0){
+        	return null;
+        }
+        //Loops through each each array in the bucket
+        while(temp != null){
+    		//Loop through each index of the current array in the bucket
+    		for(int h = 0; h < SLOTS; h++){
+    			//If the key equals the key at the current index, return the value at the current index
+    			if(key == temp.key[h]){
+    				return temp.value[h];
+    			}
+    		}
+    		temp = temp.next;
+    	}
         return null;
     } // get
 
@@ -281,9 +301,32 @@ public class LinHashMap <K, V>
     {
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
-
-        //  T O   B E   I M P L E M E N T E D
-
+        
+        //Loop through each index of the hTable
+        for(int i = 0; i < hTable.size(); i++){
+        	//Print each index number
+        	out.print(i + ": ");
+        	//Get a bucket at index i
+        	Bucket temp = hTable.get(i);
+        	while(temp.next != null){
+        		out.print("[ ");
+        		//Loop through each index of the current bucket
+        		for(int h = 0; h < SLOTS; h++){
+        			//Print out the key at index h of the bucket
+        			out.print(temp.key[h] + ",");
+        		}
+        		out.print("] ----> ");
+        		temp = temp.next;
+        	}
+        	//There is now only one bucket left
+        	out.print("[ ");
+    		//Loop through each index of the current bucket
+    		for(int h = 0; h < SLOTS; h++){
+    			//Print out the key at index h of the bucket
+    			out.print(temp.key[h] + ",");
+    		}
+    		out.print("]\n");
+        }
         out.println ("-------------------------------------------");
     } // print
 
