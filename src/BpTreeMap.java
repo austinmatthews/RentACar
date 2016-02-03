@@ -74,6 +74,14 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	/** The counter for the number nodes accessed (for performance testing).
 	 */
 	private int count = 0;
+	
+	/********************************************************************************
+	 * A getter method to retrieve root of tree for testing purposes.
+	 * @return the root of the BpTreeMap
+	 */
+	public Node getRoot() {
+		return this.root;
+	}
 
 	/********************************************************************************
 	 * Construct an empty B+Tree map.
@@ -255,7 +263,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * @param level  the current level of the B+Tree
 	 */
 	@SuppressWarnings("unchecked")
-	private void print (Node n, int level)
+	public void print (Node n, int level)
 	{
 		out.println ("BpTreeMap");
 		out.println ("-------------------------------------------");
