@@ -368,6 +368,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					foundChild = true;
 					break;
 				}
+
 			}
 			//If the child has not been found, then the key > all the keys in n and must be inserted in the node pointed to by the last meaningful value
 			//in the ref array which will be at index n.nKeys.
@@ -558,7 +559,11 @@ implements Serializable, Cloneable, SortedMap <K, V>
         //Still need to consider root and what happens when it splits.
         //Handle in splitI by checking if node to be split is the root.
         
-        
+        //1. create right sibling
+        //2. Transfer floor(ORDER/2) keys and appropriate ref[] to sibling
+        //3. Determine where new key goes
+        //4. Wedge
+        //
         
         //End ECH and KAH code.
         
