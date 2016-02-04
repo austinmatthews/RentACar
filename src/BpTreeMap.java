@@ -273,7 +273,10 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		for (int i = 0; i < n.nKeys; i++) out.print (n.key [i] + " . ");
 		out.println ("]");
 		if ( ! n.isLeaf) {
-			for (int i = 0; i <= n.nKeys; i++) print ((Node) n.ref [i], level + 1);
+			for (int i = 0; i <= n.nKeys; i++) {
+//				out.println ("this node reference #" + i);
+				print ((Node) n.ref [i], level + 1);
+			}
 		} // if
 
 		out.println ("-------------------------------------------");
@@ -311,6 +314,8 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	@SuppressWarnings("unchecked")
 	private Node insert (K key, V tupleRef, Node n)
 	{
+		System.out.println("Inserting key = " + key);
+
 		Node returnNode = n;
 		boolean inserted = false;
 		if (n.isLeaf) {                  // handle leaf node
@@ -329,16 +334,12 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					} // if
 				} // for
 				if (! inserted) {
-
 					wedgeL (key, tupleRef, n, n.nKeys);
 				}
 			}
 			else {      //handle leaf if it needs to SPLIT!
-				System.out.println("Begin else: handling leaf when it needs to split");
 				Node sib = splitL (key, tupleRef, n);
 				returnNode = sib;
-
-				System.out.println("Middle (before handling root) else: handling leaf when it needs to split");
 
 				//Create new root if and only if n == root.
 				//This is the base case of splitting and will be reached the only the first time a node is split.
@@ -350,11 +351,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					root.nKeys++;
 					root.ref[0] = n;
 					root.ref[1] = sib;
-					System.out.println("\n\nMaking new root");
-
 				}
-				System.out.println("End else: handling leaf when it needs to split");
-
 			} // if
 		}
 		else {                                         // handle internal node
@@ -362,6 +359,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 			//Begin ECH and KAH Code
 
 			Node newNode = null;
+			Node originalChildNode = null;
 			boolean foundChild = false;
 			int childIndex = 0;
 			//Need to find which child node the key belongs in
@@ -385,18 +383,25 @@ implements Serializable, Cloneable, SortedMap <K, V>
 				childIndex = n.nKeys;
 				foundChild = true;
 			}
-
+			originalChildNode = (Node)n.ref[childIndex];
+//			System.out.println("recursion has already happened...this is last case");
 			//if newNode is original child, parent does not change
 			//if newNode is right sibling, parent must wedge newNode.key[0]
 			//Then possibility of parent splitting must be addressed.
+			//if newNode.equals(n.ref[childIndex]), then the child did not split. Otherwise, newNode is the right sibling of the original child that we tried to insert into.
 			//Is this syntax correct? Should it be !(newNode.equals(n.ref[childIndex])?
-            if (!(newNode.equals(n.ref[childIndex]))) {
+            if (!(newNode.equals(originalChildNode))) {
 				inserted = false;
 				if (n.nKeys < ORDER - 1) {                  
 					for (int i = 0; i < n.nKeys; i++) {
 						K k_i = n.key [i]; 
 						if (key.compareTo (k_i) < 0) { 
-							wedgeI(newNode.key[0], tupleRef, n, i);
+//							System.out.println("before first wedgeI");
+
+							wedgeI(originalChildNode.key[originalChildNode.nKeys - 1], (V)originalChildNode, n, i);
+//							System.out.println("after first wedgeI");
+
+//							wedgeI(newNode.key[0], (V)newNode, n, i);
 							inserted = true;
 							break;
 						}
@@ -408,14 +413,58 @@ implements Serializable, Cloneable, SortedMap <K, V>
 					} // for
 					//If key has not been wedged in at this point, it needs to go into the last available spot of the node.
 					if (! inserted) {
-						wedgeI(newNode.key[0], tupleRef, n, n.nKeys);
+//						System.out.println("before second wedgeI");
+						System.out.println("&&&&&&&&&&&&&&&&&&&&");
+						System.out.println("calling wedgeI with key " + originalChildNode.key[originalChildNode.nKeys - 1]);
+						System.out.println("Number of keys = " + originalChildNode.nKeys);
+						wedgeI(originalChildNode.key[originalChildNode.nKeys - 1], (V)originalChildNode, n, n.nKeys);
+						if (originalChildNode.isLeaf == false) {
+							originalChildNode.nKeys--;
+							System.out.println("&&&&&&&&&&&&&&&&&&&&originalChildNode.nKeys--&&&&&&&&&&&&&&&&&&&&");
+						}
+//						System.out.println("after first wedgeI");
+
+//						wedgeI(newNode.key[0], (V)newNode, n, n.nKeys);
 					}
+//					System.out.println("Parent needed to split...but didn't");
+					n.ref[n.nKeys] = newNode;
+
 				}
 				//If the parent was full, then we need to split it.
 				else {
-					Node sib = splitI (key, tupleRef, n);
+//					Node sib = splitI (key, tupleRef, n);
+//					System.out.println("&&&&&&&&&&&&&&&&&&&&");
+//					System.out.println("calling SplitI with key " + originalChildNode.key[originalChildNode.nKeys - 1]);
+					Node sib = splitI(originalChildNode.key[originalChildNode.nKeys - 1], (V)originalChildNode.ref[originalChildNode.nKeys - 1],n);
 					returnNode = sib;
+					
+					sib.ref[sib.nKeys] = newNode;
+//					sib.nKeys--;
+//					if (!(originalChildNode.isLeaf)) {
+//						originalChildNode.nKeys--;
+//						System.out.println("Decrementing originalChild number of keys");
+//
+//					}
+//					originalChildNode.nKeys--;
+//					System.out.println("Parent needs to split");
+
+					
 				}
+				//attach child node to last place of parent node (newNode is child, n is parent)
+//				n.ref[n.nKeys] = newNode;
+//				n.ref[n.nKeys - 1] = originalChildNode;
+				
+				
+				//I don't think the following lines are doing anything until END BLOCK below
+				//Ensure the proper value is copied up.
+//				if(newNode.key[0].compareTo(n.key[n.nKeys - 1]) == 0) {
+//					n.key[n.nKeys - 1] = key;
+//				}
+//				if(newNode.key[0].compareTo(n.key[n.nKeys - 1]) < 0) {
+//					System.out.println("newNode.key[0].compareTo(n.key[n.nKeys - 1]) < 0");
+//					System.exit(0);
+//				}
+				//END BLOCK
 
 			}
 
@@ -428,7 +477,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		} // if
 
 		if (DEBUG) {
-			System.out.println("Inserting key = " + key);
+			System.out.println("Inserted key = " + key);
 			print (root, 0);
 		}
 		return returnNode;                                     // FIX: return useful information
@@ -465,9 +514,18 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	@SuppressWarnings("unchecked")
 	private void wedgeI (K key, V tupleRef, Node n, int i)
 	{
-		out.println ("wedgeI not implemented yet");
+//		out.println ("wedgeI not implemented yet");
 		//Begin ECH and KAH code.
-        wedgeL(key, tupleRef, n, i);
+ //       wedgeL(key, tupleRef, n, i);
+        
+        
+		for (int j = n.nKeys; j > i; j--) { 
+			n.key [j] = n.key [j-1]; 
+			n.ref [j] = n.ref [j-1]; 
+		} // for
+		n.key [i] = key; 
+//		n.ref [i] = tupleRef; 
+		n.nKeys++; 
         //End ECH and KAH code.
 
 		//  T O   B E   I M P L E M E N T E D
@@ -478,12 +536,12 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	 * Split leaf node n and return the newly created right sibling node rt.
 	 * Split first (MID keys for both node n and node rt), then add the new key and ref.
 	 * @param key  the new key to insert
-	 * @param ref  the new value/node to insert
+	 * @param tupleRef  the new value/node to insert
 	 * @param n    the current node
 	 * @return  the right sibling node (may wish to provide more information)
 	 */
 	@SuppressWarnings("unchecked")
-	private Node splitL (K key, V ref, Node n)
+	private Node splitL (K key, V tupleRef, Node n)
 	{
 		//Per Jinze Li ignore changes to parent node.
 
@@ -518,7 +576,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		for (int i = 0; i < MID; i++) {
 			K k_n = n.key [i];
 			if (key.compareTo(k_n) <= 0) {
-				wedgeL( key, ref, n, i);
+				wedgeL( key, tupleRef, n, i);
 				foundHome = true;
 				break;
 			}
@@ -529,14 +587,14 @@ implements Serializable, Cloneable, SortedMap <K, V>
 			for (int i = 0; i < MID; i++) {
 				K k_rt = rt.key [i];
 				if (key.compareTo(k_rt) <= 0) {
-					wedgeL( key, ref, rt, i);
+					wedgeL( key, tupleRef, rt, i);
 					foundHome = true;
 					break;
 				}
 			}
 			//If foundHome is still false, key is the greatest value in either node and needs to be inserted at the end of node rt.
 			if(!foundHome) {
-				wedgeL( key, ref, rt, MID);
+				wedgeL( key, tupleRef, rt, MID);
 			}
 		}
 		
@@ -558,7 +616,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 	@SuppressWarnings("unchecked")
     private Node splitI (K key, V tupleRef, Node n)
     {
-        out.println ("splitI not implemented yet");
+ //       out.println ("splitI not implemented yet");
         Node rt = new Node (false);
 
         
@@ -573,6 +631,68 @@ implements Serializable, Cloneable, SortedMap <K, V>
         //4. Wedge
         //
         
+
+		//Psuedo-psuedo code
+		//split based on mid point.
+		//for i < MID; move n.ref[] values to rt.ref[]
+		//move n.ref[] values to beginning so that MID value is in ref[1]
+		//determine which node (key, value) belong in
+		//insert them into that node using wedgeL
+		//The End???
+
+		int j = MID;
+		//This loop will split our key array into two separate arrays at MID. We don't need to "delete" keys from n.key because the insert method only looks at the number of keys in the node (not the array size) i.e. we have some trash left over but it doesn't hurt us.
+		for (int i = 0; i < MID; i++) {
+			rt.key[i] = n.key[j];
+			rt.ref[i] = n.ref[j];
+			j++;
+		}
+		rt.ref[MID] = n.ref[j];
+
+		//Setting nKeys to MID on both nodes to indicate which positions of the array hold meaningful values.
+		rt.nKeys = MID;
+		n.nKeys = MID;
+
+		//The next two loops will determine which node the key will be inserted into.
+		boolean foundHome = false;
+		//Check if the key belongs to the left node, n.
+		for (int i = 0; i < MID; i++) {
+			K k_n = n.key [i];
+			if (key.compareTo(k_n) <= 0) {
+				wedgeI( key, tupleRef, n, i);
+				foundHome = true;
+				break;
+			}
+		}
+
+		//Check if the key belongs to the right node, rt.
+		if (!foundHome){
+			for (int i = 0; i < MID; i++) {
+				K k_rt = rt.key [i];
+				if (key.compareTo(k_rt) <= 0) {
+					wedgeI( key, tupleRef, rt, i);
+					foundHome = true;
+					break;
+				}
+			}
+			//If foundHome is still false, key is the greatest value in either node and needs to be inserted at the end of node rt.
+			if(!foundHome) {
+				wedgeI( key, tupleRef, rt, MID);
+			}
+		}
+		
+		//Setting the last element of Node n's ref array to point to the right sibling node.
+//		n.ref[MID] = rt;
+        
+        if (n.equals(root)) {
+        	root = new Node(false);
+        	root.key[0] = n.key[n.nKeys -1];
+        	root.ref[0] = n;
+        	root.ref[1] = rt;
+        	root.nKeys = 1;
+        	n.nKeys--;
+        }
+//        n.nKeys--;
         //End ECH and KAH code.
         
         //  T O   B E   I M P L E M E N T E D
