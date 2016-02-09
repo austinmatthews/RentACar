@@ -318,10 +318,10 @@ implements Serializable, Cloneable, SortedMap <K, V>
         boolean inserted = false;
         if (n.isLeaf) {                                  // handle leaf node
 
-            if (n.nKeys < ORDER - 1) {
+            if (n.nKeys < ORDER - 1) {	// insert will not cause overflow
                 for (int i = 0; i < n.nKeys; i++) {
                     K k_i = n.key [i];
-                    if (key.compareTo (k_i) < 0) {
+                    if (key.compareTo (k_i) < 0) {  //find insert location
                         wedgeL (key, ref, n, i);
                         inserted = true;
                         count++;
@@ -332,12 +332,12 @@ implements Serializable, Cloneable, SortedMap <K, V>
                         break;
                     } // if
                 } // for
-                if (! inserted){
+                if (! inserted){ // insert at end
                     wedgeL (key, ref, n, n.nKeys);
                     count++;
                 }
                 return null;
-            } else {
+            } else { //overflow
 
                 for (int i = 0; i < n.nKeys; i++) {
                     K k_i = n.key [i];
@@ -347,7 +347,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
                         break;
                     } // if
                 } // for
-                if(!inserted){
+                if(!inserted){ //insert and split leaf
                     Node sib = splitL (key, ref, n);
                     n.ref[ORDER-1] = sib;
                     if(n == root){
@@ -355,13 +355,13 @@ implements Serializable, Cloneable, SortedMap <K, V>
                         root.key[0] = n.key[n.nKeys-1];
                         root.ref[0] = n;
                         root.ref[1] = sib;
-                        root.nKeys++;
+                        root.nKeys++; // will return null
                     } else {
                         returnNode = new Node(false);
                         returnNode.key[0] = n.key[n.nKeys-1];
                         returnNode.ref[0] = sib;
                         returnNode.nKeys++;
-                        return returnNode;
+                        return returnNode; 
                     }
                 }
 
@@ -369,16 +369,16 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
         } else {                                         // handle internal node
 
-            for(int i = 0; i < n.nKeys; i++){
+            for(int i = 0; i < n.nKeys; i++){ //recursive step
                 K k_i = n.key[i];
                 if(key.compareTo(k_i) < 0){
-                    returnNode = insert(key, ref, (Node)n.ref[i]);
-                    if(returnNode != null){
+                    returnNode = insert(key, ref, (Node)n.ref[i]); //insert node one level down
+                    if(returnNode != null){ // this is a node to wedgeI
                         k_i = returnNode.key[0];
                         if(n.nKeys < ORDER-1) wedgeI(k_i, (V)returnNode.ref[0], n, i);
                         else{
-                            Node sib = splitI(key, ref, n);
-                            if(sib.key[sib.nKeys] != null){
+                            Node sib = splitI(key, ref, n); //Split node
+                            if(sib.key[sib.nKeys] != null){ //check if there is another node to insert one level up
                                 Node up = new Node(false);
                                 up.key[0] = sib.key[sib.nKeys];
                                 sib.key[sib.nKeys] = null;
@@ -387,7 +387,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
                                 up.ref[0] = sib.ref[sib.nKeys+2];
                                 sib.ref[sib.nKeys+2] = null;
                                 up.nKeys++;
-                                findPos(n, sib, k_i, (V)returnNode.ref[0], up.key[0]);
+                                findPos(n, sib, k_i, (V)returnNode.ref[0], up.key[0]); //will call wedgeI
                                 return up;
                             } else {
                                 findPos(n, sib, k_i, (V)returnNode.ref[0], root.key[0]);
@@ -399,14 +399,14 @@ implements Serializable, Cloneable, SortedMap <K, V>
                     out.println ("BpTreeMap.insert2: attempt to insert duplicate key = " + key);
                     break;
                 }
-                if(i == n.nKeys-1 && key.compareTo(k_i) > 0){
-                    returnNode = insert(key, ref, (Node)n.ref[n.nKeys]);
-                    if(returnNode != null){
+                if(i == n.nKeys-1 && key.compareTo(k_i) > 0){ //recursive insert at end
+                    returnNode = insert(key, ref, (Node)n.ref[n.nKeys]); //insert node at end one level down
+                    if(returnNode != null){ // this is a node to wedgeI
                         k_i = returnNode.key[0];
                         if(n.nKeys< ORDER-1) wedgeI(k_i, (V)returnNode.ref[0], n, n.nKeys);
                         else{
-                            Node sib = splitI(key, ref, n);
-                            if(sib.key[sib.nKeys] != null){
+                            Node sib = splitI(key, ref, n); //Split node
+                            if(sib.key[sib.nKeys] != null){ //check if there is another node to insert 1 level up
                                 Node up = new Node(false);
                                 up.key[0] = sib.key[sib.nKeys];
                                 sib.key[sib.nKeys] = null;
@@ -442,6 +442,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
     private void findPos(Node n, Node sib, K key, V ref, K parentKey){
             out.println("in findPOs");
 
+            // check to see if wedgeI goes into n or its sib
             if(key.compareTo(parentKey) > 0){
                 for(int j = 0; j < sib.nKeys; j++){
                     if(key.compareTo(sib.key[j]) < 0){
@@ -553,7 +554,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
         int numKeys = n.nKeys;
 
-        for(int i = MID; i < numKeys; i++){
+        for(int i = MID; i < numKeys; i++){ // fill sib node
             rt.key[i - MID] = n.key[i];
             rt.ref[i - MID] = n.ref[i];
             n.key[i] = null;
@@ -573,7 +574,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
             root.ref[1] = rt;
             root.nKeys++;
             return rt; //meaning it is the root
-        } else {
+        } else { // add new upper node to be returned with rt
             rt.key[rt.nKeys] = n.key[MID-1];
             n.key[MID-1] = null;
             rt.ref[rt.nKeys+1] = n;

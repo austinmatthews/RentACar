@@ -199,7 +199,7 @@ public class LinHashMap <K, V>
     * Checks to see if it is the end of the round table size =  mod2
     */
     public void isEndRound(){
-        if(hTable.size() % mod2 == 0){
+        if(hTable.size() % mod2 == 0){ //check for end of round
             split = 0;
             mod1 = mod2;
             mod2 = mod2 * 2;
@@ -215,7 +215,7 @@ public class LinHashMap <K, V>
     */
     public void removeExtra(Bucket remove){
         if(remove.next != null){
-            removeExtra(remove.next);
+            removeExtra(remove.next); //recursive call to remove empty overflow buckets
             if(remove.next.nKeys == 0){
                 remove.next = null;
             }
@@ -229,17 +229,17 @@ public class LinHashMap <K, V>
     * @param value - the value to insert
     */
     public void insertOverflow(Bucket row, K key, V value){
-        if(row.next == null){
+        if(row.next == null){ //create new overflow bucket
             row.next = new Bucket(null);
             row.next.key[0]   = key;
             row.next.value[0] = value;
             row.next.nKeys++;
-        } else {
+        } else { // normal insert
             if(row.next.nKeys < 4){
                 row.next.key[row.next.nKeys] = key;
                 row.next.value[row.next.nKeys] = value;
                 row.next.nKeys++;
-            } else {
+            } else { // overflow full, recursive call to insert again
                 insertOverflow(row.next, key, value);
             }
 
@@ -256,7 +256,7 @@ public class LinHashMap <K, V>
         ArrayList<K> tempKeys = new ArrayList<K>();
         ArrayList<V> tempVals = new ArrayList<V>();
         
-        while(temp != null){
+        while(temp != null){ // insert all nodes to be rehashed
             for(int k = 0; k < SLOTS; k++){
                 if(temp.key[k] != null){
                     tempKeys.add(temp.key[k]);   temp.key[k]   = null; 
@@ -276,7 +276,7 @@ public class LinHashMap <K, V>
                 
                 if(h2(tempKeys.get(m)) == split){
                     
-                    for(int i = 0; i < Math.floor(index1/SLOTS); i++){
+                    for(int i = 0; i < Math.floor(index1/SLOTS); i++){ // keep going through overflow buckets
                         tempMod1 = tempMod1.next;
                     }
                     tempMod1.key[index1 % SLOTS] = tempKeys.get(m);
@@ -286,7 +286,7 @@ public class LinHashMap <K, V>
                     
                 } else {
 
-                    for(int i = 0; i < Math.floor(index2/SLOTS); i++){
+                    for(int i = 0; i < Math.floor(index2/SLOTS); i++){ // keep going through overflow buckets
                         if(tempMod2.next == null) tempMod2.next = new Bucket(null); 
                         tempMod2 = tempMod2.next;
                     }
