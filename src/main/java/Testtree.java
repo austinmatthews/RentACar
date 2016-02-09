@@ -7,7 +7,7 @@ public class Testtree{
 		BpTreeMap <Integer, Integer> bpt = new BpTreeMap <> (Integer.class, Integer.class);
 		Random r = new Random();
 
-		/*for(int i = 0; i < 20; i++){
+		for(int i = 0; i < 20; i++){
 			int num = r.nextInt(100);
 			System.out.println(num);
 			bpt.put(num, num);
@@ -16,9 +16,9 @@ public class Testtree{
 
 		System.out.println(bpt.get(53));
 		System.out.println(bpt.get(14));
-		System.out.println(bpt.get(65)); */
+		System.out.println(bpt.get(65));
 
-		for(int i = 0; i < 30; i++){
+		/* for(int i = 0; i < 30; i++){
 			if(i % 2 == 0) bpt.put(i, i);
 			else{
 				int num = -i;
@@ -29,7 +29,7 @@ public class Testtree{
 
 		System.out.println(bpt.get(-11));
 		System.out.println(bpt.get(-17));
-		System.out.println(bpt.get(-23));
+		System.out.println(bpt.get(-23)); */
 
 	}
 
