@@ -76,13 +76,17 @@ public class LinHashMap <K, V>
      * @param classV    the class for keys (V)
      * @param initSize  the initial number of home buckets (a power of 2, e.g., 4)
      */
-    public LinHashMap (Class <K> _classK, Class <V> _classV)    // , int initSize)
+    public LinHashMap (Class <K> _classK, Class <V> _classV, int initSize)
     {
         classK = _classK;
         classV = _classV;
         hTable = new ArrayList <> ();
         mod1   = 4;                        // initSize;
         mod2   = 2 * mod1;
+        for(int i = 0; i < initSize; i++){
+            hTable.add(new Bucket(null));
+        }
+
     } // constructor
 
     /********************************************************************************
@@ -136,10 +140,11 @@ public class LinHashMap <K, V>
     		//Loop through each index of the current array in the bucket
     		for(int h = 0; h < SLOTS; h++){
     			//If the key equals the key at the current index, return the value at the current index
-    			if(key == temp.key[h]){
+    			if(key.equals(temp.key[h])){
     				return temp.value[h];
     			}
     		}
+
     		temp = temp.next;
     	}
         return null;
@@ -153,15 +158,14 @@ public class LinHashMap <K, V>
      */
     public V put (K key, V value)
     {
-        //if(get(key) == null) return null
 
-        //init
-        if(hTable.size() == 0){
-            for(int i = 0; i < 4; i++){
-                hTable.add(new Bucket(null));
-            }
+        // duplicate key
+        if(get(key) != null){
+            out.println("\nDuplicate Key! " +key+ " Insert Failed");
+            return null;
         }
 
+        // mod the key
         int mod = h(key);
         if(mod < split) mod = h2(key);
         Bucket bucket = hTable.get(mod);
@@ -171,6 +175,7 @@ public class LinHashMap <K, V>
         int num  = hTable.get(mod).nKeys;
         boolean overflow = true;
 
+        // simple insert
         if(num < 4){
             bucket.key[num]   = key;
             bucket.value[num] = value;
@@ -178,10 +183,11 @@ public class LinHashMap <K, V>
             bucket.nKeys++;
         }
 
+        // insert causes overflow
         if(overflow){
             insertOverflow(hTable.get(mod), key, value);
             handleOverFlow();
-            removeExtra(bucket);
+            removeExtra(hTable.get(split-1));
         }
 
         isEndRound();
@@ -197,8 +203,9 @@ public class LinHashMap <K, V>
             split = 0;
             mod1 = mod2;
             mod2 = mod2 * 2;
-            System.out.println("Mod1: " + mod1);
-            System.out.println("Mod2: " + mod2);
+            out.println("Mod1: " + mod1);
+            out.println("Mod2: " + mod2);
+            out.println("End of Round");
         }
     }
 
@@ -207,12 +214,11 @@ public class LinHashMap <K, V>
     * @param remove - the bucket at mod to check if there are empty overflow buckets
     */
     public void removeExtra(Bucket remove){
-        while(remove.next != null){
+        if(remove.next != null){
+            removeExtra(remove.next);
             if(remove.next.nKeys == 0){
                 remove.next = null;
-                break;
             }
-            remove = remove.next;
         }
     }
 
@@ -246,23 +252,30 @@ public class LinHashMap <K, V>
     public void handleOverFlow(){
         hTable.add(new Bucket(null));
         Bucket temp = hTable.get(split);
+        
         ArrayList<K> tempKeys = new ArrayList<K>();
         ArrayList<V> tempVals = new ArrayList<V>();
+        
         while(temp != null){
             for(int k = 0; k < SLOTS; k++){
                 if(temp.key[k] != null){
-                    tempKeys.add(temp.key[k]);   temp.key[k]   = null; temp.nKeys--;
+                    tempKeys.add(temp.key[k]);   temp.key[k]   = null; 
+                    temp.nKeys--;
                     tempVals.add(temp.value[k]); temp.value[k] = null; 
                 }
             }
             temp = temp.next;
         }
+
         int index1 = 0; int index2 = 0;
-        Bucket tempMod1 = hTable.get(split);
-        Bucket tempMod2 = hTable.get(split + mod1);
         if(!tempKeys.isEmpty()){
+           
             for(int m = 0; m < tempKeys.size(); m++){
+                Bucket tempMod1 = hTable.get(split);
+                Bucket tempMod2 = hTable.get(split + mod1);
+                
                 if(h2(tempKeys.get(m)) == split){
+                    
                     for(int i = 0; i < Math.floor(index1/SLOTS); i++){
                         tempMod1 = tempMod1.next;
                     }
@@ -270,8 +283,11 @@ public class LinHashMap <K, V>
                     tempMod1.value[index1 % SLOTS] = tempVals.get(m);
                     tempMod1.nKeys++;
                     index1++;
+                    
                 } else {
+
                     for(int i = 0; i < Math.floor(index2/SLOTS); i++){
+                        if(tempMod2.next == null) tempMod2.next = new Bucket(null); 
                         tempMod2 = tempMod2.next;
                     }
                     tempMod2.key[index2 % SLOTS]  = tempKeys.get(m);
@@ -297,7 +313,7 @@ public class LinHashMap <K, V>
     /********************************************************************************
      * Print the hash table.
      */
-    private void print ()
+    public void print ()
     {
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
@@ -313,7 +329,8 @@ public class LinHashMap <K, V>
         		//Loop through each index of the current bucket
         		for(int h = 0; h < SLOTS; h++){
         			//Print out the key at index h of the bucket
-        			out.print(temp.key[h] + ",");
+        			if(h < SLOTS -1) out.print(temp.key[h] + ",");
+                    else out.print(temp.key[h]);
         		}
         		out.print("] ----> ");
         		temp = temp.next;
@@ -323,7 +340,8 @@ public class LinHashMap <K, V>
     		//Loop through each index of the current bucket
     		for(int h = 0; h < SLOTS; h++){
     			//Print out the key at index h of the bucket
-    			out.print(temp.key[h] + ",");
+    			if(h < SLOTS -1) out.print(temp.key[h] + ",");
+                else out.print(temp.key[h]);
     		}
     		out.print("]\n");
         }
@@ -361,7 +379,7 @@ public class LinHashMap <K, V>
         int totalKeys    = 30;
         boolean RANDOMLY = false;
 
-        LinHashMap <Integer, Integer> ht = new LinHashMap <> (Integer.class, Integer.class);
+        LinHashMap <Integer, Integer> ht = new LinHashMap <> (Integer.class, Integer.class, 4);
         if (args.length == 1) totalKeys = Integer.valueOf (args [0]);
 
         if (RANDOMLY) {
