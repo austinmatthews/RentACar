@@ -304,7 +304,285 @@ implements Serializable, Cloneable, SortedMap <K, V>
 		} // for
 		return (n.isLeaf) ? null : find (key, (Node) n.ref [n.nKeys]);
 	} // find
+    /********************************************************************************
+     * Recursive helper function for inserting a key in B+trees.
+     * @param key  the key to insert
+     * @param ref  the value/node to insert
+     * @param n    the current node
+     * @return  the node inserted into (may wish to return more information)
+     */
+    @SuppressWarnings("unchecked")
+    private Node insert (K key, V ref, Node n)
+    {
+        Node returnNode = null;
+        boolean inserted = false;
+        if (n.isLeaf) {                                  // handle leaf node
 
+            if (n.nKeys < ORDER - 1) {
+                for (int i = 0; i < n.nKeys; i++) {
+                    K k_i = n.key [i];
+                    if (key.compareTo (k_i) < 0) {
+                        wedgeL (key, ref, n, i);
+                        inserted = true;
+                        count++;
+                        break;
+                    } else if (key.equals (k_i)) {
+                        out.println ("BpTreeMap.insert: attempt to insert duplicate key = " + key);
+                        inserted = true;
+                        break;
+                    } // if
+                } // for
+                if (! inserted){
+                    wedgeL (key, ref, n, n.nKeys);
+                    count++;
+                }
+                return null;
+            } else {
+
+                for (int i = 0; i < n.nKeys; i++) {
+                    K k_i = n.key [i];
+                    if (key.equals (k_i)) {
+                        out.println ("BpTreeMap.insert: attempt to insert duplicate key = " + key);
+                        inserted = true;
+                        break;
+                    } // if
+                } // for
+                if(!inserted){
+                    Node sib = splitL (key, ref, n);
+                    n.ref[ORDER-1] = sib;
+                    if(n == root){
+                        root = new Node(false);
+                        root.key[0] = n.key[n.nKeys-1];
+                        root.ref[0] = n;
+                        root.ref[1] = sib;
+                        root.nKeys++;
+                    } else {
+                        returnNode = new Node(false);
+                        returnNode.key[0] = n.key[n.nKeys-1];
+                        returnNode.ref[0] = sib;
+                        returnNode.nKeys++;
+                        return returnNode;
+                    }
+                }
+
+            } // if
+
+        } else {                                         // handle internal node
+
+            for(int i = 0; i < n.nKeys; i++){
+                K k_i = n.key[i];
+                if(key.compareTo(k_i) < 0){
+                    returnNode = insert(key, ref, (Node)n.ref[i]);
+                    if(returnNode != null){
+                        k_i = returnNode.key[0];
+                        if(n.nKeys < ORDER-1) wedgeI(k_i, (V)returnNode.ref[0], n, i);
+                        else{
+                            Node sib = splitI(key, ref, n);
+                            if(sib.key[sib.nKeys] != null){
+                                Node up = new Node(false);
+                                up.key[0] = sib.key[sib.nKeys];
+                                sib.key[sib.nKeys] = null;
+                                up.ref[0] = sib.ref[sib.nKeys+1];
+                                sib.ref[sib.nKeys+1] = null;
+                                up.ref[0] = sib.ref[sib.nKeys+2];
+                                sib.ref[sib.nKeys+2] = null;
+                                up.nKeys++;
+                                findPos(n, sib, k_i, (V)returnNode.ref[0], up.key[0]);
+                                return up;
+                            } else {
+                                findPos(n, sib, k_i, (V)returnNode.ref[0], root.key[0]);
+                            }
+                        }
+                    }
+                    break;
+                } else if(key.compareTo(k_i) == 0){
+                    out.println ("BpTreeMap.insert2: attempt to insert duplicate key = " + key);
+                    break;
+                }
+                if(i == n.nKeys-1 && key.compareTo(k_i) > 0){
+                    returnNode = insert(key, ref, (Node)n.ref[n.nKeys]);
+                    if(returnNode != null){
+                        k_i = returnNode.key[0];
+                        if(n.nKeys< ORDER-1) wedgeI(k_i, (V)returnNode.ref[0], n, n.nKeys);
+                        else{
+                            Node sib = splitI(key, ref, n);
+                            if(sib.key[sib.nKeys] != null){
+                                Node up = new Node(false);
+                                up.key[0] = sib.key[sib.nKeys];
+                                sib.key[sib.nKeys] = null;
+                                up.ref[0] = sib.ref[sib.nKeys+1];
+                                sib.ref[sib.nKeys+1] = null;
+                                up.ref[0] = sib.ref[sib.nKeys+2];
+                                sib.ref[sib.nKeys+2] = null;
+                                up.nKeys++;
+                                findPos(n, sib, k_i, (V)returnNode.ref[0], up.key[0]);
+                                return up;
+                            } else {
+                                findPos(n, sib, k_i, (V)returnNode.ref[0], root.key[0]);
+                            }                      
+                        }
+                        break;
+                    }
+                }
+            }
+            
+
+        } // if
+
+        if (DEBUG) print (root, 0);
+        return null;                                     // FIX: return useful information
+    } // insert
+
+    /**
+    * @param n      the current node
+    * @param sib    the sibling node
+    * @param key    the key to insert
+    * @param ref    the node to insert
+    */
+    private void findPos(Node n, Node sib, K key, V ref, K parentKey){
+            out.println("in findPOs");
+
+            if(key.compareTo(parentKey) > 0){
+                for(int j = 0; j < sib.nKeys; j++){
+                    if(key.compareTo(sib.key[j]) < 0){
+                        wedgeI(key, ref, sib, j);
+                        break;
+                    }
+                    if(j == sib.nKeys-1 && key.compareTo(sib.key[j]) > 0){
+                        wedgeI(key, ref, sib, sib.nKeys);
+                        break;
+                    }
+                }
+            } else {
+                for(int j = 0; j < n.nKeys; j++){
+                    if(key.compareTo(n.key[j]) < 0){
+                        wedgeI(key, ref, n, j);
+                        break;
+                    }
+                    if(j == n.nKeys-1 && key.compareTo(n.key[j]) > 0){
+                        wedgeI(key, ref, n, n.nKeys);
+                        break;
+                    }
+                }
+            }
+    }
+
+
+    /********************************************************************************
+     * Wedge the key-ref pair into leaf node n.
+     * @param key  the key to insert
+     * @param ref  the value/node to insert
+     * @param n    the current node
+     * @param i    the insertion position within node n
+     */
+    private void wedgeL (K key, V ref, Node n, int i)
+    {
+        for (int j = n.nKeys; j > i; j--) {
+            n.key [j] = n.key [j-1];
+            n.ref [j] = n.ref [j-1];
+        } // for
+        n.key [i] = key;
+        n.ref [i] = ref;
+        n.nKeys++;
+    } // wedgeL
+
+    /********************************************************************************
+     * Wedge the key-ref pair into internal node n.
+     * @param key  the key to insert
+     * @param ref  the value/node to insert
+     * @param n    the current node
+     * @param i    the insertion position within node n
+     */
+    private void wedgeI (K key, V ref, Node n, int i)
+    {
+        out.println ("wedgeI not implemented yet");
+
+        for(int j = n.nKeys; j > i; j--){
+            n.key[j]   = n.key[j-1];
+            n.ref[j+1] = n.ref[j];
+        }
+        n.key[i]   = key;
+        n.ref[i+1] = ref;
+        n.nKeys++;
+
+    } // wedgeI
+
+    /********************************************************************************
+     * Split leaf node n and return the newly created right sibling node rt.
+     * Split first (MID keys for both node n and node rt), then add the new key and ref.
+     * @param key  the new key to insert
+     * @param ref  the new value/node to insert
+     * @param n    the current node
+     * @return  the right sibling node (may wish to provide more information)
+     */
+    private Node splitL (K key, V ref, Node n)
+    {
+        out.println ("splitL not implemented yet");
+        Node rt = new Node (true);
+        int numKeys = n.nKeys;
+
+        for(int i = MID; i < numKeys; i++){
+            rt.key[i - MID] = n.key[i];
+            rt.ref[i - MID] = n.ref[i];
+            n.key[i] = null;
+            n.ref[i] = null;
+            n.nKeys--;
+            rt.nKeys++;
+        }
+
+        if(key.compareTo(n.key[n.nKeys-1]) > 0) insert(key, ref, rt);
+        else insert(key, ref, n);
+
+        //  T O   B E   I M P L E M E N T E D
+
+        return rt;
+    } // splitL
+
+    /********************************************************************************
+     * Split internal node n and return the newly created right sibling node rt.
+     * Split first (MID keys for node n and MID-1 for node rt), then add the new key and ref.
+     * @param key  the new key to insert
+     * @param ref  the new value/node to insert
+     * @param n    the current node
+     * @return  the right sibling node (may wish to provide more information)
+     */
+    private Node splitI (K key, V ref, Node n)
+    {
+        out.println ("splitI not implemented yet");
+        Node rt = new Node (false);
+
+        int numKeys = n.nKeys;
+
+        for(int i = MID; i < numKeys; i++){
+            rt.key[i - MID] = n.key[i];
+            rt.ref[i - MID] = n.ref[i];
+            n.key[i] = null;
+            n.ref[i] = null;
+            n.nKeys--;
+            rt.nKeys++;
+        }
+        rt.ref[rt.nKeys] = n.ref[ORDER-1];
+        n.ref[ORDER-1] = null;
+
+        if(n == root){
+            root = new Node(false);
+            root.key[0] = n.key[MID-1];
+            n.key[MID-1] = null;
+            n.nKeys--;
+            root.ref[0] = n;
+            root.ref[1] = rt;
+            root.nKeys++;
+            return rt; //meaning it is the root
+        } else {
+            rt.key[rt.nKeys] = n.key[MID-1];
+            n.key[MID-1] = null;
+            rt.ref[rt.nKeys+1] = n;
+            rt.ref[rt.nKeys+2] = rt;
+            n.nKeys--;
+            return rt;
+        }
+
+    } // splitI
 
 	/********************************************************************************
 	 * The main method used for testing.
