@@ -161,7 +161,7 @@ public class LinHashMap <K, V>
 
         // duplicate key
         if(get(key) != null){
-            out.println("\nDuplicate Key! " +key+ " Insert Failed");
+            out.println("Duplicate Key! " +key+ " Insert Failed");
             return null;
         }
 
@@ -203,9 +203,9 @@ public class LinHashMap <K, V>
             split = 0;
             mod1 = mod2;
             mod2 = mod2 * 2;
-            out.println("Mod1: " + mod1);
+            out.println("\nMod1: " + mod1);
             out.println("Mod2: " + mod2);
-            out.println("End of Round");
+            out.println("End of Round\n");
         }
     }
 
