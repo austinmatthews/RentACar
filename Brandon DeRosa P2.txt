@@ -1,0 +1,19 @@
+Brandon DeRosa
+CSCI 4370 Database
+Team Leader: Lauren Clapper
+
+For project 2 I was tasked with implementing the insert method for Linear Hashing as well as the entrySet method for 
+Linear Hashing. One thing that I uncommeneted out was the initSize in the constructor. I set this variables to four
+in the object declaration. Also the first added of buckets is also done in the constructor. Then we can start hashing elements. If there is overflow in a bucket, an overflow bucket is created and the bucket at index equal to split is rehashed, and split is incremented. Now if the next hashed element is less than split, we use the higher power mod function to hash variables. We continue hashing variables until the size of the hash table % higher power mod == 0. This indicated the end of the round and the high res mod function doubles and the lower res = old high res mod function. 
+For the entrySet method, I just created a new HashMap and added each key, value pair to the hashmap. In java there is a hashmap function called entrySet, that takes an hashmap and creates a hashset with it. This is equivalent to just creating abstract map simple entries and adding them to a hash set. 
+
+All method that were changes/implemented/created include:
+
+- public LinHashMap (Class <K> _classK, Class <V> _classV, int initSize)
+- public Set <Map.Entry <K, V>> entrySet ()
+- public V put (K key, V value)
+	-(put) public void removeExtra(Bucket remove)
+	-(put) public void isEndRound()
+	-(put) public void insertOverflow(Bucket row, K key, V value)
+	-(put) public void handleOverFlow()
+- All Linear Hashing JUnit testing
