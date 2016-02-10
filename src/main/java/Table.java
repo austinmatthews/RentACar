@@ -124,6 +124,16 @@ implements Serializable
 	//----------------------------------------------------------------------------------
 
 	/************************************************************************************
+	 * Return the list of tuples
+	 *
+	 * @return  the list of tuples
+	 */
+	public List getTuples () {
+		return this.tuples;
+	}
+	
+	
+	/************************************************************************************
 	 * Project the tuples onto a lower dimension by keeping only the given attributes.
 	 * Check whether the original key is included in the projection.
 	 *
