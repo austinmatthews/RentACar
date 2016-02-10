@@ -656,6 +656,19 @@ implements Serializable
 	} // extract
 
 	/************************************************************************************
+	 * A public method to be used to test typeCheck.
+	 *
+	 * @param t  the tuple as a list of attribute values
+	 * @return  whether the tuple has the right size and values that comply
+	 *          with the given domains
+	 */
+	public boolean testTypeCheck (Comparable [] t)
+	{ 
+		boolean toReturn = this.typeCheck(t);
+		return toReturn;
+	}
+	
+	/************************************************************************************
 	 * Check the size of the tuple (number of elements in list) as well as the type of
 	 * each value to ensure it is from the right domain. 
 	 *
