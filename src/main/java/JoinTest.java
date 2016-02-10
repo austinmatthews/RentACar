@@ -1,3 +1,4 @@
+
 import static java.lang.System.out;
 
 class JoinTest{
