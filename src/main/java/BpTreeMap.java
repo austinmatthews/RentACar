@@ -349,6 +349,7 @@ implements Serializable, Cloneable, SortedMap <K, V>
                 } // for
                 if(!inserted){ //insert and split leaf
                     Node sib = splitL (key, ref, n);
+                    sib.ref[ORDER-1] = n.ref[ORDER-1];
                     n.ref[ORDER-1] = sib;
                     if(n == root){
                         root = new Node(false);
