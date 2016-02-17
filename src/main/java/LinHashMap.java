@@ -128,6 +128,9 @@ public class LinHashMap <K, V>
         if(i < split){
         	i = h2(key);
         }
+
+        if(i < 0) Math.abs(i);
+
         //Get the bucket in hTable at index i
         Bucket temp = hTable.get(i);
         
