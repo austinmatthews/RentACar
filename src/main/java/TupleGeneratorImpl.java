@@ -8,7 +8,7 @@
 import static java.lang.System.out;
 import java.util.*;
 
-/*****************************************************************************************
+/**
  * This class is used to populate a database (collection of tables) with randomly
  * generated values that satisfy the following integrity constraints: domain, primary
  * keys and foreign key constraints.
@@ -34,7 +34,7 @@ public class TupleGeneratorImpl
 
     HashMap <String, String [][]> tablefks = new HashMap <> ();
     
-    /*******************************************************************************************
+    /**
      * Adding relation to Schema.
      * @param name        the name of the table
      * @param attribute   the array of attributes
@@ -53,7 +53,7 @@ public class TupleGeneratorImpl
         counter++;
     } // addRelSchema
     
-    /*******************************************************************************************
+    /**
      * Adding relation to Schema.  Convenience method.
      * @param name        the name of the table
      * @param attribute   the string embedding the table's attributes
@@ -68,7 +68,7 @@ public class TupleGeneratorImpl
                       primaryKey.split (" "), foreignKey);
     } // addRelSchema
 
-    /***********************************************************************************
+    /**
      * Generates random tuples that satisfy all the integrity constraints.
      * @param tuples  the number of tuples for each table
      * @return  tempResult contains tuples for all the tables in the order they were added

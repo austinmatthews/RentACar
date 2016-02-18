@@ -1,5 +1,5 @@
 
-/*****************************************************************************************
+/**
  * @file  TupleGenerator.java
  *
  * @author   Sadiq Charaniya, John Miller
@@ -10,7 +10,7 @@
  */
 public interface TupleGenerator
 {
-    /*************************************************************************************
+    /**
      * Add the relational schema for a given table.  Do this for all tables and then
      * generate the tuples.
      * @param name        the table's name
@@ -24,7 +24,7 @@ public interface TupleGenerator
     void addRelSchema (String name, String [] attribute, String [] domain,
                        String [] primaryKey, String [][] foreignKey); 
 
-    /*************************************************************************************
+    /**
      * Add the relational schema for a given table.  Do this for all tables and then
      * generate the tuples.  This is convenience method.
      * @param name        the table's name
@@ -36,7 +36,7 @@ public interface TupleGenerator
     void addRelSchema (String name, String attribute, String domain,
                        String primaryKey, String [][] foreignKey); 
 
-    /*************************************************************************************
+    /**
      * Generate tuples for all of the tables.
      * @param   nTuples  the int array that contains the number of tuple for each table
      * @return  Comparable [i][j][k] 3D array, where 'i' is the table number,

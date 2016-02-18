@@ -7,14 +7,14 @@
 
 import static java.lang.System.out;
 
-/*****************************************************************************************
+/**
  * This class tests the TupleGenerator on the Student Registration Database defined in the
  * Kifer, Bernstein and Lewis 2006 database textbook (see figure 3.6).  The primary keys
  * (see figure 3.6) and foreign keys (see example 3.2.2) are as given in the textbook.
  */
 public class TestTupleGenerator
 {
-    /*************************************************************************************
+    /**
      * The main method is the driver for TestGenerator.
      * @param args  the command-line arguments
      */
