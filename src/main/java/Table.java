@@ -302,24 +302,27 @@ implements Serializable
 			String [] t_attrs = attributes1.split (" ");
 			String [] u_attrs = attributes2.split (" ");
 
-			//find column positions of each attribute
-			Comparable[] temp = null;
-			int col1 = col(attributes1);
-			int col2 = table2.col(attributes2);
+			if(t_attrs.length == u_attrs.length){
+			
+				Comparable[] temp = null;
 
-			//iterate over both tables to check if the tuple value at matching attribute position are equal
-			for(int i = 0; i < table2.tuples.size(); i++){
-				for(int j = 0; j < tuples.size(); j++){
+			    //iterate over both tables to check if the tuple value at matching attribute position are equal
+				for(int i = 0; i < table2.tuples.size(); i++){
+					for(int j = 0; j < tuples.size(); j++){
 
-					int result = table2.tuples.get(i)[col2].compareTo(tuples.get(j)[col1]);
-					// if there are equal then add them to the new table
-					if(result == 0){
+						//find column positions of each attribute
+						Comparable[] cols1 = extract(tuples.get(j), t_attrs);
+						Comparable[] cols2 = table2.extract(table2.tuples.get(i), u_attrs);
+						boolean truth = true;
 
-						temp = ArrayUtil.concat(tuples.get(j), table2.tuples.get(i));
-						rows.add(temp);
+						for(int k = 0; k < cols1.length; k++){
+							if(cols1[k].compareTo(cols2[k]) != 0) truth = false;
+						}
+						if(truth){
+							rows.add(ArrayUtil.concat(tuples.get(j), table2.tuples.get(i)));
+						}
 
 					}
-
 				}
 			}
 
@@ -335,8 +338,6 @@ implements Serializable
 
 				}
 			}
-
-
 
 			return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
 					ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -463,6 +464,53 @@ implements Serializable
 		return new Table (name + count++, ArrayUtil.concat (attribute, mm),
 				ArrayUtil.concat (domain, table2.extractDom(colPos, table2.domain)), key, rows);
 	} // join
+
+	/**
+	* @param attr1 - attributes from table 1
+	* @param attr2 - attributes from table 2
+	* @param table2 - table to be join with this
+	* @return new table containing the index-join
+	*/
+	public Table indexJoin(String attr1, String attr2, Table table2){
+
+		if(table2 == null){
+			return this;
+		}
+
+		String [] t_attrs = attr1.split (" ");
+		String [] u_attrs = attr2.split (" ");
+
+		List<Comparable []> rows = new ArrayList<Comparable []>();
+
+		if(t_attrs.length == u_attrs.length){
+
+			for(Comparable [] t : tuples){
+
+				Comparable[] match = table2.index.get(new KeyType(extract(t, t_attrs)));
+				if(match != null){
+
+					rows.add(ArrayUtil.concat(t, match));
+
+				}
+
+			}
+
+			for(int x = 0; x < table2.attribute.length; x++){
+				for(int y = 0; y < attribute.length; y++){
+
+					if(table2.attribute[x].equals(attribute[y]))
+						table2.attribute[x] += 2;
+
+				}
+			}
+
+			return new Table(name + count++, ArrayUtil.concat(attribute, table2.attribute),
+							ArrayUtil.concat(domain, table2.domain), key, rows);
+		} else {
+			return null;
+		}
+
+	}
 
 	/************************************************************************************
 	 * Return the column position for the given attribute name.
