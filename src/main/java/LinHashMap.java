@@ -122,14 +122,17 @@ public class LinHashMap <K, V>
      */
     public V get (Object key)
     {
+        out.println(key);
     	//Gives index of where the key is
         int i = h (key);
+        out.println(i);
+        if(i < 0)  i = Math.abs(i);
         //Gets the index if the original bucket has been split already
         if(i < split){
         	i = h2(key);
         }
 
-        if(i < 0) Math.abs(i);
+        System.out.println(i);
 
         //Get the bucket in hTable at index i
         Bucket temp = hTable.get(i);
@@ -160,8 +163,7 @@ public class LinHashMap <K, V>
      * @return  null (not the previous value)
      */
     public V put (K key, V value)
-    {
-
+    {   
         // duplicate key
         if(get(key) != null){
             out.println("Duplicate Key! " +key+ " Insert Failed");
@@ -170,6 +172,7 @@ public class LinHashMap <K, V>
 
         // mod the key
         int mod = h(key);
+        if(mod < 0) mod = Math.abs(mod);
         if(mod < split) mod = h2(key);
         Bucket bucket = hTable.get(mod);
 
