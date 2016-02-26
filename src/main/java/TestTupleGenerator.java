@@ -57,19 +57,47 @@ public class TestTupleGenerator
 
         String [] tables = { "Student", "Professor", "Course", "Teaching", "Transcript" };
         
+        Table Student = new Table ("Student",
+                			"id name address status",
+                			"Integer String String String",
+                			"id");
+        
+        Table Professor = new Table("Professor",
+                           "id name deptId",
+                           "Integer String String",
+                           "id");
+        
+        Table Course = new Table("Course",
+                           "crsCode deptId crsName descr",
+                           "String String String String",
+                           "crsCode");
+        
+        Table Teaching = new Table("Teaching",
+                           "crsCode semester profId",
+                           "String String Integer",
+                           "crcCode semester" );
+        
+        Table Transcript = new Table("Transcript",
+                           "studId crsCode semester grade",
+                           "Integer String String String",
+                           "studId crsCode semester");
+        
         int tups [] = new int [] { 10000, 1000, 2000, 50000, 5000 };
+        
+        Table [] tabless = { Student, Professor, Course, Teaching, Transcript };
     
         Comparable [][][] resultTest = test.generate (tups);
         
         for (int i = 0; i < resultTest.length; i++) {
-            out.println (tables [i]);
+    //        out.println (tables [i]);
             for (int j = 0; j < resultTest [i].length; j++) {
-                for (int k = 0; k < resultTest [i][j].length; k++) {
-                    out.print (resultTest [i][j][k] + ",");
-                } // for
-                out.println ();
+            	tabless[i].insert(resultTest[i][j]);
+            	//for (int k = 0; k < resultTest [i][j].length; k++) {
+                //    out.print (resultTest [i][j][k] + ",");
+               // } // for
+      //          out.println ();
             } // for
-            out.println ();
+        //    out.println ();
         } // for
     } // main
 
