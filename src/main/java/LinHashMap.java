@@ -125,7 +125,7 @@ public class LinHashMap <K, V>
     	//Gives index of where the key is
         int i = h (key);
 
-        if(i < 0)  i = Math.abs(i);
+        if(i < 0)  i = Math.abs(i);   
         //Gets the index if the original bucket has been split already
         if(i < split){
         	i = h2(key);

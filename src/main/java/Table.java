@@ -81,7 +81,7 @@ implements Serializable
 		key       = _key;
 		tuples    = new ArrayList <> ();
 		index     = new LinHashMap <> (KeyType.class, Comparable[].class, 4);       // also try BPTreeMap, LinHashMap or ExtHashMap
-//		index     = new BpTreeMap<>(KeyType.class, Comparable[].class);
+//		index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
 
 	} // constructor
 
@@ -102,7 +102,8 @@ implements Serializable
 		domain    = _domain;
 		key       = _key;
 		tuples    = _tuples;
-		index     = new TreeMap <> ();       // also try BPTreeMap, LinHashMap or ExtHashMap
+		index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
+		index     = new LinHashMap <> (KeyType.class, Comparable[].class, 4);       // also try BPTreeMap, LinHashMap or ExtHashMap
 	} // constructor
 
 	/************************************************************************************
