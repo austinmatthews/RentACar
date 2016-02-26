@@ -6,6 +6,8 @@
  */
 
 import static java.lang.System.out;
+import java.util.Date;
+import java.util.Scanner;
 
 /**
  * This class tests the TupleGenerator on the Student Registration Database defined in the
@@ -82,7 +84,7 @@ public class TestTupleGenerator
                            "Integer String String String",
                            "studId crsCode semester");
         
-        int tups [] = new int [] { 10000, 1000, 2000, 50000, 5000 };
+        int tups [] = new int [] { 100000, 100, 100, 100, 100 };
         
         Table [] tabless = { Student, Professor, Course, Teaching, Transcript };
     
@@ -99,7 +101,26 @@ public class TestTupleGenerator
             } // for
         //    out.println ();
         } // for
+        
+        
+        System.out.println("B+Tree Select");
+        Scanner in = new Scanner(System.in);
+        for (int k=0; k<5 ; k++){
+        	Integer key = in.nextInt();
+        	Date date = new Date();
+        	long startTime = System.nanoTime();
+        
+        	Table t_iselect = Student.select (new KeyType (key));
+        
+        	long endTime = System.nanoTime();
+        	System.out.println((endTime-startTime)/1000 + "micro sec");
+        }
+        
+        
+        
     } // main
+    
+    
 
 } // TestTupleGenerator
 
