@@ -77,7 +77,7 @@ public class TestTupleGenerator
         Table Teaching = new Table("Teaching",
                            "crsCode semester profId",
                            "String String Integer",
-                           "crcCode semester" );
+                           "crsCode semester" );
         
         Table Transcript = new Table("Transcript",
                            "studId crsCode semester grade",
@@ -91,15 +91,10 @@ public class TestTupleGenerator
         Comparable [][][] resultTest = test.generate (tups);
         
         for (int i = 0; i < resultTest.length; i++) {
-    //        out.println (tables [i]);
+
             for (int j = 0; j < resultTest [i].length; j++) {
             	tabless[i].insert(resultTest[i][j]);
-            	//for (int k = 0; k < resultTest [i][j].length; k++) {
-                //    out.print (resultTest [i][j][k] + ",");
-               // } // for
-      //          out.println ();
             } // for
-        //    out.println ();
         } // for
         
         
