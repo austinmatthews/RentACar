@@ -122,17 +122,14 @@ public class LinHashMap <K, V>
      */
     public V get (Object key)
     {
-        out.println(key);
     	//Gives index of where the key is
         int i = h (key);
-        out.println(i);
+
         if(i < 0)  i = Math.abs(i);
         //Gets the index if the original bucket has been split already
         if(i < split){
         	i = h2(key);
         }
-
-        System.out.println(i);
 
         //Get the bucket in hTable at index i
         Bucket temp = hTable.get(i);
@@ -176,8 +173,6 @@ public class LinHashMap <K, V>
         if(mod < split) mod = h2(key);
         Bucket bucket = hTable.get(mod);
 
-        out.println ("LinearHashMap.put: key = " + key + ", h() = " + mod + ", value = " + value);
-
         int num  = hTable.get(mod).nKeys;
         boolean overflow = true;
 
@@ -209,9 +204,6 @@ public class LinHashMap <K, V>
             split = 0;
             mod1 = mod2;
             mod2 = mod2 * 2;
-            out.println("\nMod1: " + mod1);
-            out.println("Mod2: " + mod2);
-            out.println("End of Round\n");
         }
     }
 
