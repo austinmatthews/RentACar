@@ -130,6 +130,7 @@ public class LinHashMap <K, V>
         if(i < split){
         	i = h2(key);
         }
+        if(i < 0) i = Math.abs(i);
 
         //Get the bucket in hTable at index i
         Bucket temp = hTable.get(i);
@@ -171,6 +172,7 @@ public class LinHashMap <K, V>
         int mod = h(key);
         if(mod < 0) mod = Math.abs(mod);
         if(mod < split) mod = h2(key);
+        if(mod < 0) mod = Math.abs(mod);
         Bucket bucket = hTable.get(mod);
 
         int num  = hTable.get(mod).nKeys;

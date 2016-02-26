@@ -102,7 +102,7 @@ implements Serializable
 		domain    = _domain;
 		key       = _key;
 		tuples    = _tuples;
-		index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
+		//index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
 		index     = new LinHashMap <> (KeyType.class, Comparable[].class, 4);       // also try BPTreeMap, LinHashMap or ExtHashMap
 	} // constructor
 
