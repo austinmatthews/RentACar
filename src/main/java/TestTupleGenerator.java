@@ -85,6 +85,7 @@ public class TestTupleGenerator
                            "studId crsCode semester");
         
         int tups [] = new int [] { 100000, 1000, 2000, 50000, 1000 };
+
         
         Table [] tabless = { Student, Professor, Course, Teaching, Transcript };
     
@@ -99,7 +100,26 @@ public class TestTupleGenerator
 
         testJoin();
 
+        
+        System.out.println("B+Tree Select");
+        Scanner in = new Scanner(System.in);
+        for (int k=0; k<5 ; k++){
+        	Integer key = in.nextInt();
+        	Date date = new Date();
+        	long startTime = System.nanoTime();
+        
+        	Table t_iselect = Student.select (new KeyType (key));
+        
+        	long endTime = System.nanoTime();
+        	System.out.println((endTime-startTime)/1000 + "micro sec");
+        }
+        ///
+        
+        
+        
     } // main
+    
+    
 
     public static void testJoin(){
 
@@ -127,8 +147,8 @@ public class TestTupleGenerator
            "studId crsCode semester grade",
            "Integer String String String",
            "studId crsCode semester");
-        int tups [] = new int [] {1000};
-        int tup2 [] = new int [] {1000};
+        int tups [] = new int [] {100000};
+        int tup2 [] = new int [] {100000};
 
         Comparable [][][] result  = tester.generate(tups);
         Comparable [][][] result2 = tester2.generate(tup2);
@@ -146,10 +166,10 @@ public class TestTupleGenerator
         }
 
         try{
-            PrintWriter writer = new PrintWriter(new FileWriter(new File("JoinNestedLoop.txt"), true));
+            PrintWriter writer = new PrintWriter(new FileWriter(new File("a.txt"), true));
            
             long start = System.nanoTime();
-            Table t_join = Transcript.join("studId", "id", Student);
+            Table t_join = Transcript.indexJoin("studId", "id", Student);
             long end = System.nanoTime();
             long diff = (end - start) / 1000000;
             
