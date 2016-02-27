@@ -11,13 +11,13 @@ public class LinHashInsertTest{
 
 		// RANDOM NUMBERS
 
-		for(int i = 0; i < 100; i++){
-			int rand = r.nextInt(100);
+		for(int i = 0; i < 1000000; i++){
+			int rand = r.nextInt(10000000);
 			map.put(rand, rand);
 			//map.print();
 		}
 
-		out.println("RANDOM NUMBERS");
+		/*out.println("RANDOM NUMBERS");
 		map.print();
 		map.entrySet();
 		out.println();
@@ -44,7 +44,7 @@ public class LinHashInsertTest{
 
 		out.println(map2.get(r.nextInt(100)));
 		out.println(map2.get(r.nextInt(100)));
-		out.println(map2.get(r.nextInt(100)));
+		out.println(map2.get(r.nextInt(100)));*/
 
 
 	}

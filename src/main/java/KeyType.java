@@ -64,7 +64,7 @@ public class KeyType
      */
     public boolean equals (KeyType k)
     {
-        return compareTo (k) == 0;
+        return this.compareTo (k) == 0;
     } // equals
 
     /*************************************************************************************

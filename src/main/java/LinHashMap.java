@@ -14,7 +14,7 @@ import java.util.*;
  * This class provides hash maps that use the Linear Hashing algorithm.
  * A hash table is created that is an array of buckets.
  */
-public class LinHashMap <K, V>
+public class LinHashMap <K extends Comparable <K>, V>
        extends AbstractMap <K, V>
        implements Serializable, Cloneable, Map <K, V>
 {
@@ -120,11 +120,11 @@ public class LinHashMap <K, V>
      * @param key  the key used for look up
      * @return  the value associated with the key
      */
+    @SuppressWarnings("unchecked")
     public V get (Object key)
     {
     	//Gives index of where the key is
         int i = h (key);
-
         if(i < 0)  i = Math.abs(i);   
         //Gets the index if the original bucket has been split already
         if(i < split){
@@ -142,9 +142,9 @@ public class LinHashMap <K, V>
         //Loops through each each array in the bucket
         while(temp != null){
     		//Loop through each index of the current array in the bucket
-    		for(int h = 0; h < SLOTS; h++){
+    		for(int h = 0; h < temp.nKeys; h++){
     			//If the key equals the key at the current index, return the value at the current index
-    			if(key.equals(temp.key[h])){
+                if(((K)key).compareTo((K)temp.key[h]) == 0){
     				return temp.value[h];
     			}
     		}

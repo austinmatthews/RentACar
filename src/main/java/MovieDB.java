@@ -151,7 +151,11 @@ class MovieDB
         t_join2.print ();
 
         out.println ();
-        Table t_join3 = movie.join ("studioName", "name", studio);
+        movie.print();
+        out.println("\n\n\n");
+        studio.print();
+        out.println("\n\n\n");
+        Table t_join3 = movie.indexJoin ("studioName", "name", studio);
         t_join3.print ();
       
 

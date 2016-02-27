@@ -114,9 +114,21 @@ implements Serializable, Cloneable, SortedMap <K, V>
  {
   Set <Map.Entry <K, V>> enSet = new HashSet <> ();
 
-  //  T O   B E   I M P L E M E N T E D
+  Node node = getRoot();
+  Map<K, V> map = new HashMap<K, V>();
 
-  return enSet;
+  while(!root.isLeaf){
+     root = (Node)root.ref[0];
+  }
+
+  while(node != null){
+     for(int i = 0; i < node.nKeys; i++){
+          map.put(node.key[i], (V)node.ref[i]);
+     }
+     node = (Node)node.ref[ORDER-1];
+  }
+
+  return map.entrySet();
  } // entrySet
 
  /********************************************************************************
@@ -256,6 +268,10 @@ implements Serializable, Cloneable, SortedMap <K, V>
 
  } // size
 
+ public void printStart(){
+     print(root, 0);
+ }
+
  /********************************************************************************
   * Print the B+Tree using a pre-order traveral and indenting each level.
   * @param n      the current node to print
@@ -293,12 +309,13 @@ implements Serializable, Cloneable, SortedMap <K, V>
   for (int i = 0; i < n.nKeys; i++) {
    K k_i = n.key [i];
    if (key.compareTo (k_i) <= 0) {
-    if (n.isLeaf) {
-     return (key.equals (k_i)) ? (V) n.ref [i] : null;
-    } 
-    else {
-     return find (key, (Node) n.ref [i]);
-    } // if
+        if (n.isLeaf) {
+            if(key.compareTo(k_i) == 0) return (V)n.ref[i];
+            else return null;
+        } 
+        else {
+            return find (key, (Node) n.ref [i]);
+        } // if
    } // if
   } // for
   return (n.isLeaf) ? null : find (key, (Node) n.ref [n.nKeys]);

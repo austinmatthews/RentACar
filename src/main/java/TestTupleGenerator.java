@@ -6,6 +6,8 @@
  */
 
 import static java.lang.System.out;
+import java.io.*;
+import java.util.*;
 
 /**
  * This class tests the TupleGenerator on the Student Registration Database defined in the
@@ -82,19 +84,85 @@ public class TestTupleGenerator
                            "Integer String String String",
                            "studId crsCode semester");
         
-        int tups [] = new int [] { 10000, 1000, 2000, 50000, 5000 };
+        int tups [] = new int [] { 100000, 1000, 2000, 50000, 1000 };
         
         Table [] tabless = { Student, Professor, Course, Teaching, Transcript };
     
-        Comparable [][][] resultTest = test.generate (tups);
+        /*Comparable [][][] resultTest = test.generate (tups);
         
         for (int i = 0; i < resultTest.length; i++) {
 
             for (int j = 0; j < resultTest [i].length; j++) {
             	tabless[i].insert(resultTest[i][j]);
             } // for
-        } // for
+        } // for */
+
+        testJoin();
+
     } // main
+
+    public static void testJoin(){
+
+        TupleGenerator tester  = new TupleGeneratorImpl ();
+        TupleGenerator tester2 = new TupleGeneratorImpl ();
+
+        tester.addRelSchema ("Student",
+                           "id name address status",
+                           "Integer String String String",
+                           "id",
+                           null);
+
+        tester2.addRelSchema ("Transcript",
+                           "studId crsCode semester grade",
+                           "Integer String String String",
+                           "studId crsCode semester",
+                           null);
+
+        Table Student = new Table ("Student",
+            "id name address status",
+            "Integer String String String",
+            "id");
+
+        Table Transcript = new Table("Transcript",
+           "studId crsCode semester grade",
+           "Integer String String String",
+           "studId crsCode semester");
+        int tups [] = new int [] {1000};
+        int tup2 [] = new int [] {1000};
+
+        Comparable [][][] result  = tester.generate(tups);
+        Comparable [][][] result2 = tester2.generate(tup2);
+        Table [] tables = {Student, Transcript};
+
+        for(int i = 0; i < result.length; i++){
+            for(int j = 0; j < result[i].length; j++){
+                tables[0].insert(result[i][j]);
+            }
+        }
+        for(int i = 0; i < result2.length; i++){
+            for(int j = 0; j < result2[i].length; j++){
+                tables[1].insert(result2[i][j]);
+            }
+        }
+
+        try{
+            PrintWriter writer = new PrintWriter(new FileWriter(new File("JoinNestedLoop.txt"), true));
+           
+            long start = System.nanoTime();
+            Table t_join = Transcript.join("studId", "id", Student);
+            long end = System.nanoTime();
+            long diff = (end - start) / 1000000;
+            
+            System.out.println("Time difference: " + diff);
+
+            writer.println(diff);
+            writer.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
 
 } // TestTupleGenerator
 

@@ -80,8 +80,9 @@ implements Serializable
 		domain    = _domain;
 		key       = _key;
 		tuples    = new ArrayList <> ();
+		//index     = new TreeMap <> ();
 		index     = new LinHashMap <> (KeyType.class, Comparable[].class, 4);       // also try BPTreeMap, LinHashMap or ExtHashMap
-//		index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
+		//index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
 
 	} // constructor
 
@@ -102,6 +103,7 @@ implements Serializable
 		domain    = _domain;
 		key       = _key;
 		tuples    = _tuples;
+		//index     = new TreeMap <> ();
 		//index     = new BpTreeMap <> (KeyType.class, Comparable[].class);
 		index     = new LinHashMap <> (KeyType.class, Comparable[].class, 4);       // also try BPTreeMap, LinHashMap or ExtHashMap
 	} // constructor
@@ -327,6 +329,7 @@ implements Serializable
 				}
 			}
 
+			/*
 			//concatenate 2 to end of attribute name if they are duplicates
 
 			//find way to merge the 2 nested for loops
@@ -338,7 +341,7 @@ implements Serializable
 						table2.attribute[x] += 2;
 
 				}
-			}
+			}*/
 
 			return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
 					ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -485,25 +488,28 @@ implements Serializable
 
 		if(t_attrs.length == u_attrs.length){
 
-			for(Comparable [] t : tuples){
+			for(Comparable[] t : this.tuples){
 
 				Comparable[] match = table2.index.get(new KeyType(extract(t, t_attrs)));
+
 				if(match != null){
 
 					rows.add(ArrayUtil.concat(t, match));
 
+				} else {
+					//out.println("Null");
 				}
 
 			}
 
-			for(int x = 0; x < table2.attribute.length; x++){
+			/*for(int x = 0; x < table2.attribute.length; x++){
 				for(int y = 0; y < attribute.length; y++){
 
 					if(table2.attribute[x].equals(attribute[y]))
 						table2.attribute[x] += 2;
 
 				}
-			}
+			}*/
 
 			return new Table(name + count++, ArrayUtil.concat(attribute, table2.attribute),
 							ArrayUtil.concat(domain, table2.domain), key, rows);
@@ -538,7 +544,7 @@ implements Serializable
 	 */
 	public boolean insert (Comparable [] tup)
 	{
-		out.println ("DML> insert into " + name + " values ( " + Arrays.toString (tup) + " )");
+		//out.println ("DML> insert into " + name + " values ( " + Arrays.toString (tup) + " )");
 
 		if (typeCheck (tup)) {
 			tuples.add (tup);
