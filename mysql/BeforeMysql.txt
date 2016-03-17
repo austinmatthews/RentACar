@@ -1,0 +1,29 @@
+-- 1 List the name of the student with id equal to v1 (id).
+
+-- 2 List the names of students with id in the range of v2 (id) to v3 (inclusive).
+-- 3 	List the names of students who have taken course v4 (crsCode).
+
+-- 4 List the names of students who have taken a course taught by professor v5 (name).
+-- 5 List the names of students who have taken a course from department v6 (deptId), but not v7.
+-- 6 List the names of students who have taken all courses offered by department v8 (deptId).
+
+-- 1
+SELECT name FROM Student WHERE Student.id = v1;
+
+-- 2
+SELECT name FROM Student WHERE Student.id BETWEEN v2 AND v3;
+
+-- 3
+SELECT s.name FROM Student s JOIN Transcript t ON t.studId = s.id WHERE t.crsCode = v4;
+
+-- 4
+SELECT s.name FROM Student s JOIN Transcript tr ON tr.studId = s.id JOIN Teaching t ON t.crsCode = tr.crsCode
+AND t.semester = tr.semester JOIN Professor p ON p.id = t.profId WHERE p.name = v5;
+
+-- 5
+SELECT s.name FROM Student s JOIN Transcript t ON t.studId = s.id JOIN Course c on t.crsCode = c.crsCode WHERE t.crsCode = v6 AND t.crsCode !=v7;
+
+-- 6
+SELECT s.name FROM Student s JOIN ( (SELECT crsCode FROM Course WHERE Course.deptId = v8) AS t1 
+	JOIN Transcript ON t1.crsCode = Transcript.crsCode) AS t2
+	ON t2.studid = s.id;
