@@ -23,7 +23,7 @@ Help!
 
 -- 5 (Brandon)
 select name from Student s join Transcript t on s.id = t.studId join Course c on c.crsCode = t.crsCode where c.deptId = 'v6'
-MINUS
+not in
 select name from Student s join Transcript t on s.id = t.studId join COurse c on c.crsCode = t.crsCode where c.deptId = 'v7'
 
 
