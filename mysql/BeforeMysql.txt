@@ -21,7 +21,7 @@ SELECT s.name FROM Student s JOIN Transcript tr ON tr.studId = s.id JOIN Teachin
 AND t.semester = tr.semester JOIN Professor p ON p.id = t.profId WHERE p.name = v5;
 
 -- 5
-SELECT s.name FROM Student s JOIN Transcript t ON t.studId = s.id JOIN Course c on t.crsCode = c.crsCode WHERE t.crsCode = v6 AND t.crsCode !=v7;
+Help!
 
 -- 6
 SELECT s.name FROM Student s JOIN ( (SELECT crsCode FROM Course WHERE Course.deptId = v8) AS t1 
