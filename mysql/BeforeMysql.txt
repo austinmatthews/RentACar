@@ -28,6 +28,4 @@ select name from Student s join Transcript t on s.id = t.studId join COurse c on
 
 
 -- 6
-SELECT s.name FROM Student s JOIN ( (SELECT crsCode FROM Course WHERE Course.deptId = v8) AS t1 
-	JOIN Transcript ON t1.crsCode = Transcript.crsCode) AS t2
-	ON t2.studid = s.id;
+SELECT student.name  FROM (SELECT crsCode FROM Course WHERE Course.deptId = 'v8') AS t1  JOIN Transcript ON t1.crsCode = Transcript.crsCode JOIN Student ON transcript.studId = student.id;
