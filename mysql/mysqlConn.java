@@ -20,7 +20,7 @@ public class mysqlConn{
 		try{
 
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/CSCI4370", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db2", "root", "");
 			System.out.println("Database successfully connected to!");
 
 
@@ -66,7 +66,7 @@ public class mysqlConn{
 				{ "crsCode semester", "Teaching", "crsCode semester" }});
 
 
-			int[] numTups = new int[] {50, 50, 50, 50, 50};
+			int[] numTups = new int[] {500000, 500000, 500000, 500000, 500000};
 
 			System.out.println("Start Generating");
 			result = gen.generate(numTups);

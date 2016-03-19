@@ -1,0 +1,194 @@
+Query Plans
+
+Below you will find each query detailed with the query plans from mysql before and after tuning. 
+In addition, you will find an explanation of what was done to tune the query.
+
+1. List the name of the student with id equal to v1 (id).
+	Statement: SELECT name FROM Student WHERE Student.id = 787457;
+	Before Tuning Query Plan: 
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		|  1 | SIMPLE      | Student | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 489708 |    10.00 | Using where |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		1 row in set, 1 warning (0.01 sec)
+		
+	Tuning Process:
+		The student table was altered by adding keys to name and id. In addition, analyze was called on the student table.
+
+	Before Tuning Execution Time: 190 ms
+	After Tuning Execution Time: 0 ms
+	Improvement from Tuning: 190 ms
+		
+	After Tuning Query Plan: 
+		+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
+		| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref   | rows | filtered | Extra |
+		+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
+		|  1 | SIMPLE      | Student | NULL       | ref  | id            | id   | 5       | const |    1 |   100.00 | NULL  |
+		+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
+		1 row in set, 1 warning (0.00 sec)
+
+
+2. List the names of students with id in the range of v2 (id) to v3 (inclusive).
+	Statement: SELECT name FROM Student WHERE Student.id BETWEEN 25633 AND 902846;
+	Before Tuning Query Plan: 
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		|  1 | SIMPLE      | Student | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 489708 |    11.11 | Using where |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		1 row in set, 1 warning (0.00 sec)
+	
+	Tuning Process:
+		The student table was altered by adding keys for name and id. However, this particular query did not show much improvement.
+		We tried rewriting the query in the following two forms (these can also be found in the AfterMysql.sql file, but are commented out):
+		SELECT name FROM Student WHERE Student.id >= 25633 AND Student.id <= 902846;
+		SELECT name FROM Student WHERE Student.id >= 25633 UNION SELECT name FROM Student WHERE Student.id <= 902846;
+		However, the resulting query plans and run times for these two queries did not improve the original query. Analyze was also 
+		called on the Student table. This was the only query that did not show significant improvement. It is possible that this is because
+		the query itself returned 438646 rows and it was just not possible to significantly improve the performance.
+		
+	Before Tuning Execution Time: 250 ms
+	After Tuning Execution Time: 0 ms
+	Improvement from Tuning: 240 ms
+		
+	After Tuning Query Plan: 
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		|  1 | SIMPLE      | Student | NULL       | ALL  | id            | NULL | NULL    | NULL | 497925 |    50.00 | Using where |
+		+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+		1 row in set, 1 warning (0.01 sec)
+
+
+3. List the names of students who have taken course v4 (crsCode).
+	Statement: SELECT s.name FROM Student s JOIN Transcript t ON t.studId = s.id WHERE t.crsCode = 'crsCode484738';
+	Before Tuning Query Plan: 
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 472708 |    10.00 | Using where                                        |
+		|  1 | SIMPLE      | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 489708 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		2 rows in set, 1 warning (0.00 sec)
+
+	Tuning Process:
+		We called analyze on both the Transcript and Student tables. We added keys to Transcript.studId, Transcript.crsCode, and Student.id.
+		There was significant improvement to the query plan based on these changes.
+		
+	Before Tuning Execution Time: 240 ms
+	After Tuning Execution Time: 0 ms
+	Improvement from Tuning: 0 ms
+
+	After Tuning Query Plan: 
+		+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
+		| id | select_type | table | partitions | type | possible_keys  | key     | key_len | ref          | rows | filtered | Extra       |
+		+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
+		|  1 | SIMPLE      | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | const        |    1 |   100.00 | Using where |
+		|  1 | SIMPLE      | s     | NULL       | ref  | id             | id      | 5       | db2.t.studId |    1 |   100.00 | NULL        |
+		+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
+		2 rows in set, 1 warning (0.00 sec)
+		
+		
+4. List the names of students who have taken a course taught by professor v5 (name).
+	Statement: SELECT s.name FROM Student s JOIN Transcript tr ON tr.studId = s.id JOIN Teaching t ON t.crsCode = tr.crsCode AND t.semester = tr.semester JOIN Professor p ON p.id = t.profId WHERE p.name = 'name244706';
+	Before Tuning Query Plan: 
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		|  1 | SIMPLE      | p     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498659 |    10.00 | Using where                                        |
+		|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498514 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		|  1 | SIMPLE      | tr    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498701 |     1.00 | Using where; Using join buffer (Block Nested Loop) |
+		|  1 | SIMPLE      | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498242 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		4 rows in set, 1 warning (0.00 sec)
+	
+	Tuning Process:
+		We called analyze on the Transcript, Teaching, Professor and Student tables. We added keys to Transcript.studId, Transcript.crsCode, Transcript.semester,
+		Teaching.profId, Teaching.crsCode, Teaching.semester, Professor.id, and Student.id.
+		There was significant improvement to the query plan based on these changes.
+	
+	Before Tuning Execution Time: 880 ms
+	After Tuning Execution Time: 280 ms
+	Improvement from Tuning: 600 ms
+		
+	After Tuning Query Plan: 
+	
+		+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+		| id | select_type | table | partitions | type | possible_keys           | key      | key_len | ref            | rows   | filtered | Extra       |
+		+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+		|  1 | SIMPLE      | p     | NULL       | ALL  | id                      | NULL     | NULL    | NULL           | 498399 |    10.00 | Using where |
+		|  1 | SIMPLE      | t     | NULL       | ref  | crsCode,semester,profId | profId   | 5       | db2.p.id       |      1 |   100.00 | Using where |
+		|  1 | SIMPLE      | tr    | NULL       | ref  | studId,crsCode,semester | semester | 303     | db2.t.semester |      1 |     3.14 | Using where |
+		|  1 | SIMPLE      | s     | NULL       | ref  | id                      | id       | 5       | db2.tr.studId  |      1 |   100.00 | NULL        |
+		+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+		4 rows in set, 1 warning (0.01 sec)
+
+
+5. List the names of students who have taken a course from department v6 (deptId), but not v7.
+	Statement: 	SELECT name FROM Student s JOIN Transcript t ON s.id = t.studId JOIN Course c ON c.crsCode = t.crsCode WHERE c.deptId = 'deptId210330'
+				NOT IN
+				(SELECT name FROM Student s JOIN Transcript t ON s.id = t.studId JOIN Course c ON c.crsCode = t.crsCode WHERE c.deptId = 'deptId328787');
+	Before Tuning Query Plan: 
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		|  1 | SIMPLE      | c     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 453104 |    10.00 | Using where                                        |
+		|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 472708 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		|  1 | SIMPLE      | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 489708 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		3 rows in set, 1 warning (0.00 sec)
+	
+	Tuning Process:
+		We called analyze on the Transcript, Course, and Student tables. We added keys to Transcript.studId, Transcript.crsCode,
+		Course.deptId, Course.crsCode, Student.name, and Student.id.
+		There was significant improvement to the query plan based on these changes.
+	
+	Before Tuning Execution Time: 890 ms
+	After Tuning Execution Time: 360 ms
+	Improvement from Tuning: 530 ms
+	
+	After Tuning Query Plan: 
+		+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+		| id | select_type | table | partitions | type | possible_keys  | key     | key_len | ref           | rows   | filtered | Extra       |
+		+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+		|  1 | PRIMARY     | c     | NULL       | ALL  | crsCode,deptId | NULL    | NULL    | NULL          | 498063 |    10.00 | Using where |
+		|  1 | PRIMARY     | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.c.crsCode |      2 |   100.00 | Using where |
+		|  1 | PRIMARY     | s     | NULL       | ref  | id             | id      | 5       | db2.t.studId  |      1 |   100.00 | NULL        |
+		|  2 | SUBQUERY    | c     | NULL       | ref  | crsCode,deptId | deptId  | 303     | const         |      1 |   100.00 | Using where |
+		|  2 | SUBQUERY    | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.c.crsCode |      2 |   100.00 | Using where |
+		|  2 | SUBQUERY    | s     | NULL       | ref  | id,name        | id      | 5       | db2.t.studId  |      1 |     5.00 | NULL        |
+		+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+		6 rows in set, 3 warnings (0.00 sec)
+
+
+6. List the names of students who have taken all courses offered by department v8 (deptId).
+	Statement: SELECT student.name  FROM (SELECT crsCode FROM Course WHERE Course.deptId = 'deptId595927') AS t1 JOIN Transcript ON t1.crsCode = Transcript.crsCode JOIN Student ON transcript.studId = student.id;
+	Before Tuning Query Plan: 
+		+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		| id | select_type | table      | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
+		+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		|  1 | SIMPLE      | Course     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 453104 |    10.00 | Using where                                        |
+		|  1 | SIMPLE      | Transcript | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 472708 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		|  1 | SIMPLE      | Student    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 489708 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
+		+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+		3 rows in set, 1 warning (0.00 sec)
+	
+	Tuning Process:
+		We called analyze on the Transcript, Course, and Student tables. We added keys to Transcript.studId, Transcript.crsCode,
+		Course.deptId, Course.crsCode, Student.name, and Student.id.
+		There was significant improvement to the query plan based on these changes. This query showed the most improvement based on tuning.
+	
+	Before Tuning Execution Time: 980 ms
+	After Tuning Execution Time: 0 ms
+	Improvement from Tuning: 0 ms
+	
+	After Tuning Query Plan: 
+		+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+		| id | select_type | table      | partitions | type | possible_keys  | key     | key_len | ref                   | rows | filtered | Extra       |
+		+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+		|  1 | SIMPLE      | Course     | NULL       | ref  | crsCode,deptId | deptId  | 303     | const                 |    2 |   100.00 | Using where |
+		|  1 | SIMPLE      | Transcript | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.Course.crsCode    |    2 |   100.00 | Using where |
+		|  1 | SIMPLE      | Student    | NULL       | ref  | id             | id      | 5       | db2.Transcript.studId |    1 |   100.00 | NULL        |
+		+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+		3 rows in set, 1 warning (0.00 sec)

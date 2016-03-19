@@ -3,11 +3,11 @@ Query Plans
 1. List the name of the student with id equal to v1 (id).
 	Statement: SELECT name FROM Student WHERE Student.id = 788387;
 	Query Plan: 
-	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
-	| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
-	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
-	|  1 | SIMPLE      | Student | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498035 |    10.00 | Using where |
-	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+	+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
+	| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref   | rows | filtered | Extra |
+	+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
+	|  1 | SIMPLE      | Student | NULL       | ref  | id            | id   | 5       | const |    1 |   100.00 | NULL  |
+	+----+-------------+---------+------------+------+---------------+------+---------+-------+------+----------+-------+
 	1 row in set, 1 warning (0.00 sec)
 
 	
@@ -18,20 +18,21 @@ Query Plans
 	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
 	| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
 	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
-	|  1 | SIMPLE      | Student | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498035 |    11.11 | Using where |
+	|  1 | SIMPLE      | Student | NULL       | ALL  | id            | NULL | NULL    | NULL | 497925 |    50.00 | Using where |
 	+----+-------------+---------+------------+------+---------------+------+---------+------+--------+----------+-------------+
-	1 row in set, 1 warning (0.00 sec)
+	1 row in set, 1 warning (0.01 sec)
+
 
 
 3. List the names of students who have taken course v4 (crsCode).
 	Statement: SELECT name FROM Student s JOIN Transcript t on t.studId = s.id WHERE t.crsCode = 'crsCode569673';
 	Query Plan: 
-	+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-	| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
-	+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-	|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498166 |    10.00 | Using where                                        |
-	|  1 | SIMPLE      | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498035 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-	+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
+	+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
+	| id | select_type | table | partitions | type | possible_keys  | key     | key_len | ref          | rows | filtered | Extra       |
+	+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
+	|  1 | SIMPLE      | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | const        |    1 |   100.00 | Using where |
+	|  1 | SIMPLE      | s     | NULL       | ref  | id             | id      | 5       | db2.t.studId |    1 |   100.00 | NULL        |
+	+----+-------------+-------+------------+------+----------------+---------+---------+--------------+------+----------+-------------+
 	2 rows in set, 1 warning (0.00 sec)
 
 
@@ -39,25 +40,32 @@ Query Plans
 	Statement: SELECT s.name FROM Student s JOIN Transcript tr ON tr.studId = s.id JOIN Teaching t ON t.crsCode = tr.crsCode AND t.semester = tr.semester JOIN Professor p ON p.id = t.profId WHERE p.name = 'name817907';
 	Query Plan: 
 	
-	
+	+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+	| id | select_type | table | partitions | type | possible_keys           | key      | key_len | ref            | rows   | filtered | Extra       |
+	+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+	|  1 | SIMPLE      | p     | NULL       | ALL  | id                      | NULL     | NULL    | NULL           | 498399 |    10.00 | Using where |
+	|  1 | SIMPLE      | t     | NULL       | ref  | crsCode,semester,profId | profId   | 5       | db2.p.id       |      1 |   100.00 | Using where |
+	|  1 | SIMPLE      | tr    | NULL       | ref  | studId,crsCode,semester | semester | 303     | db2.t.semester |      1 |     3.14 | Using where |
+	|  1 | SIMPLE      | s     | NULL       | ref  | id                      | id       | 5       | db2.tr.studId  |      1 |   100.00 | NULL        |
+	+----+-------------+-------+------------+------+-------------------------+----------+---------+----------------+--------+----------+-------------+
+	4 rows in set, 1 warning (0.01 sec)
+
 
 5. List the names of students who have taken a course from department v6 (deptId), but not v7.
 	Statement: select name from Student s join Transcript t on s.id = t.studId join Course c on c.crsCode = t.crsCode where c.deptId = 'deptId848958' not in (select name from Student s join Transcript t on s.id = t.studId join Course c on c.crsCode = t.crsCode where c.deptId = 'deptId593018');
 	Query Plan: 
 	
-
-
-+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
-+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-|  1 | PRIMARY     | c     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497806 |    10.00 | Using where                                        |
-|  1 | PRIMARY     | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498051 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-|  1 | PRIMARY     | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497925 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-|  2 | SUBQUERY    | c     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497806 |    10.00 | Using where                                        |
-|  2 | SUBQUERY    | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498051 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-|  2 | SUBQUERY    | s     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497925 |     1.90 | Using where; Using join buffer (Block Nested Loop) |
-+----+-------------+-------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-6 rows in set, 1 warning (0.00 sec)
+	+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+	| id | select_type | table | partitions | type | possible_keys  | key     | key_len | ref           | rows   | filtered | Extra       |
+	+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+	|  1 | PRIMARY     | c     | NULL       | ALL  | crsCode,deptId | NULL    | NULL    | NULL          | 498063 |    10.00 | Using where |
+	|  1 | PRIMARY     | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.c.crsCode |      2 |   100.00 | Using where |
+	|  1 | PRIMARY     | s     | NULL       | ref  | id             | id      | 5       | db2.t.studId  |      1 |   100.00 | NULL        |
+	|  2 | SUBQUERY    | c     | NULL       | ref  | crsCode,deptId | deptId  | 303     | const         |      1 |   100.00 | Using where |
+	|  2 | SUBQUERY    | t     | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.c.crsCode |      2 |   100.00 | Using where |
+	|  2 | SUBQUERY    | s     | NULL       | ref  | id,name        | id      | 5       | db2.t.studId  |      1 |     5.00 | NULL        |
+	+----+-------------+-------+------------+------+----------------+---------+---------+---------------+--------+----------+-------------+
+	6 rows in set, 3 warnings (0.00 sec)
 
 
 
@@ -66,13 +74,13 @@ Query Plans
 6. List the names of students who have taken all courses offered by department v8 (deptId).
 	Statement: SELECT student.name  FROM (SELECT crsCode FROM Course WHERE Course.deptId = 'deptId76008') AS t1  JOIN Transcript ON t1.crsCode = Transcript.crsCode JOIN Student ON transcript.studId = student.id;
 	Query Plan: 
-	+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-| id | select_type | table      | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra                                              |
-+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-|  1 | SIMPLE      | Course     | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497935 |    10.00 | Using where                                        |
-|  1 | SIMPLE      | Transcript | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 497935 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-|  1 | SIMPLE      | Student    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 498035 |    10.00 | Using where; Using join buffer (Block Nested Loop) |
-+----+-------------+------------+------------+------+---------------+------+---------+------+--------+----------+----------------------------------------------------+
-3 rows in set, 1 warning (0.01 sec)
+	+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+	| id | select_type | table      | partitions | type | possible_keys  | key     | key_len | ref                   | rows | filtered | Extra       |
+	+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+	|  1 | SIMPLE      | Course     | NULL       | ref  | crsCode,deptId | deptId  | 303     | const                 |    2 |   100.00 | Using where |
+	|  1 | SIMPLE      | Transcript | NULL       | ref  | studId,crsCode | crsCode | 303     | db2.Course.crsCode    |    2 |   100.00 | Using where |
+	|  1 | SIMPLE      | Student    | NULL       | ref  | id             | id      | 5       | db2.Transcript.studId |    1 |   100.00 | NULL        |
+	+----+-------------+------------+------------+------+----------------+---------+---------+-----------------------+------+----------+-------------+
+	3 rows in set, 1 warning (0.00 sec)
 	
 	
