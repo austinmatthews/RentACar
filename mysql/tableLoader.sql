@@ -1,4 +1,4 @@
-USE CSCI4370;
+USE db2;
 
 -- Tables ----
 

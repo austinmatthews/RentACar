@@ -18,16 +18,12 @@ SELECT s.name FROM Student s JOIN Transcript t ON t.studId = s.id WHERE t.crsCod
 SELECT s.name FROM Student s JOIN Transcript tr ON tr.studId = s.id JOIN Teaching t ON t.crsCode = tr.crsCode
 AND t.semester = tr.semester JOIN Professor p ON p.id = t.profId WHERE p.name = v5;
 
--- 5
-Help!
 
 -- 5 (Brandon)
 select name from Student s join Transcript t on s.id = t.studId join Course c on c.crsCode = t.crsCode where c.deptId = 'v6'
-MINUS
+not in
 select name from Student s join Transcript t on s.id = t.studId join COurse c on c.crsCode = t.crsCode where c.deptId = 'v7'
 
 
 -- 6
-SELECT s.name FROM Student s JOIN ( (SELECT crsCode FROM Course WHERE Course.deptId = v8) AS t1 
-	JOIN Transcript ON t1.crsCode = Transcript.crsCode) AS t2
-	ON t2.studid = s.id;
+SELECT student.name  FROM (SELECT crsCode FROM Course WHERE Course.deptId = 'v8') AS t1  JOIN Transcript ON t1.crsCode = Transcript.crsCode JOIN Student ON transcript.studId = student.id;

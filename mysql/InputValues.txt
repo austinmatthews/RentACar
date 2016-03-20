@@ -1,0 +1,19 @@
+Input values:
+
+v1 = id = 788387
+v2 = id = 329333
+v3 = id = 564950
+v4 = crsCode = crsCode569673
+v5 = name = name244706
+v6 = deptId = deptId848958
+v7 = deptId = deptId593018
+v8 = deptId = deptId76008
+
+v1 = id = 787457
+v2 = id = 25633
+v3 = id = 902846
+v4 = crsCode = crsCode484738
+v5 = name = name244706
+v6 = deptId = deptId210330
+v7 = deptId = deptId328787
+v8 = deptId = deptId595927
