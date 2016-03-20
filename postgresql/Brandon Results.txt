@@ -1,0 +1,6 @@
+2. 89.564  ms (avg 5 trials)
+   .307    ms (avg 5 trials)
+4. 750.122 ms (avg 5 trials)
+   435.188 ms (avg 5 trials)
+6. 770.321 ms (avg 5 trials)
+   550.971 ms (avg 5 trials)
