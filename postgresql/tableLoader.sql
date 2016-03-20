@@ -44,13 +44,6 @@ CREATE TABLE Transcript(
 );
 
 
-
-
--- 2 List the names of students with id in the range of v2 (id) to v3 (inclusive).
--- 4 List the names of students who have taken a course taught by professor v5 (name).
--- 6 List the names of students who have taken all courses offered by department v8 (deptId).
-
-
 -- 2
 SELECT name FROM Student WHERE Student.id BETWEEN v2 AND v3
 
