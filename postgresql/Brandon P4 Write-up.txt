@@ -1,0 +1,12 @@
+Brandon DeRosa
+Project 4
+CSCI 4370
+
+For this project I was tasked with writing PostgreSQL queries 2, 4, 6. I optimized the queries by adding indices.
+I rewrote one of the queries (4), but the other two did not need fixed. I added indices based on the frequency of
+the column use. I did not add an index on all columns used in my query because it is bad practice. It is bad practice because
+the more indices you add, the slower the update and insert functions are. However I was able to speed up the queries quite a bit.
+In addition to writing the psql queries 2,4,6, I was also wrote several other classes. I wrote the tableLoader.sql file.
+This file created the tables for the database. Also I wrote the psqlConn.java class for database population. I used
+the tupleGenerator from the last project to create random variables for hthe database. For the time trials I took an average
+of 5 trials for each query before and after. 
